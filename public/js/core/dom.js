@@ -86,6 +86,7 @@ export const dom = {
 
   // Graph Search & Filters
   graphSearch: $('graphSearch'),
+  filterMessage: $('filterMessage'),
   filterAuthor: $('filterAuthor'),
   filterBranch: $('filterBranch'),
   clearFiltersBtn: $('clearFiltersBtn'),

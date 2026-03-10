@@ -197,11 +197,18 @@ function bindEvents() {
       applyFilters({ author: dom.filterAuthor.value.trim() });
     }, 400);
   });
+  dom.filterMessage.addEventListener('input', () => {
+    clearTimeout(filterDebounce);
+    filterDebounce = setTimeout(() => {
+      applyFilters({ message: dom.filterMessage.value.trim() });
+    }, 400);
+  });
   dom.filterBranch.addEventListener('change', () => {
     applyFilters({ branch: dom.filterBranch.value });
   });
   dom.clearFiltersBtn.addEventListener('click', () => {
     dom.graphSearch.value = '';
+    dom.filterMessage.value = '';
     dom.filterAuthor.value = '';
     dom.filterBranch.value = '';
     clearFilters();

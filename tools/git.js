@@ -131,7 +131,10 @@ async function getLog(count = 50, skip = 0, filters = {}) {
     args.push(filters.branch);
   }
   if (filters.author) {
-    args.push(`--author=${filters.author}`);
+    args.push('-i', `--author=${filters.author}`);
+  }
+  if (filters.message) {
+    args.push('-i', `--grep=${filters.message}`);
   }
   if (filters.since) {
     args.push(`--since=${filters.since}`);

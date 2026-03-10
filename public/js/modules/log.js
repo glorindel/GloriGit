@@ -610,6 +610,7 @@ export function applyFilters(filters) {
   const payload = { count: 200 };
   if (filterState.branch) payload.branch = filterState.branch;
   if (filterState.author) payload.author = filterState.author;
+  if (filterState.message) payload.message = filterState.message;
   if (filterState.since) payload.since = filterState.since;
   if (filterState.until) payload.until = filterState.until;
 
@@ -617,7 +618,7 @@ export function applyFilters(filters) {
 }
 
 export function clearFilters() {
-  filterState = { branch: '', author: '', since: '', until: '' };
+  filterState = { branch: '', author: '', message: '', since: '', until: '' };
   highlightBranch = null;
   searchHash = '';
   selectedIdx = -1;
