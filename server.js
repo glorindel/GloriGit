@@ -73,10 +73,8 @@ function serveStatic(req, res) {
       return;
     }
 
-    // Cache static assets aggressively
-    const cacheControl = ext === '.html'
-      ? 'no-cache'
-      : 'public, max-age=31536000, immutable';
+    // Disable caching during development so browser picks up app.js changes
+    const cacheControl = 'no-cache';
 
     res.writeHead(200, {
       'Content-Type': contentType,
@@ -222,6 +220,10 @@ wss.on('connection', (ws) => {
           await gitEngine.discardFile(payload.file);
           result = await gitEngine.getStatus();
           break;
+        case 'discard-untracked':
+          await gitEngine.deleteUntrackedFile(payload.file);
+          result = await gitEngine.getStatus();
+          break;
 
         default:
           ws.send(JSON.stringify({ id, error: `Unknown action: ${action}` }));
@@ -234,7 +236,7 @@ wss.on('connection', (ws) => {
       const mutatingActions = [
         'stage', 'unstage', 'stage-all', 'unstage-all',
         'commit', 'push', 'pull', 'checkout', 'create-branch',
-        'delete-branch', 'merge', 'discard'
+        'delete-branch', 'merge', 'discard', 'discard-untracked'
       ];
       if (mutatingActions.includes(action)) {
         broadcastStatus();

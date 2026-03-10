@@ -106,9 +106,11 @@
 
     ws.onmessage = (event) => {
       const msg = JSON.parse(event.data);
+      let isReply = false;
 
       // Handle response to pending request
       if (msg.id && state.pendingRequests.has(msg.id)) {
+        isReply = true;
         const { resolve, reject } = state.pendingRequests.get(msg.id);
         state.pendingRequests.delete(msg.id);
         if (msg.error) {
@@ -140,7 +142,7 @@
           break;
       }
 
-      if (msg.error) {
+      if (msg.error && !isReply) {
         toast(msg.error, 'error');
       }
     };
@@ -195,6 +197,10 @@
   //  RENDER: STATUS
   // =========================================
   function renderStatus(status) {
+    // Prevent UI blinking: only re-render if the status data actually changed
+    if (state.status && JSON.stringify(state.status) === JSON.stringify(status)) {
+      return; 
+    }
     state.status = status;
 
     // Update branch display
@@ -702,14 +708,17 @@
 
     dom.diffDiscardBtn.addEventListener('click', () => {
       if (!state.selectedFile) return;
+      const isUntracked = state.selectedType === 'untracked';
+      const actionText = isUntracked ? 'delete' : 'discard all changes to';
       showModal(
-        'Discard Changes',
-        `Are you sure you want to discard all changes to <strong>${escapeHtml(state.selectedFile)}</strong>? This cannot be undone.`,
+        isUntracked ? 'Delete File' : 'Discard Changes',
+        `Are you sure you want to ${actionText} <strong>${escapeHtml(state.selectedFile)}</strong>? This cannot be undone.`,
         async () => {
           try {
-            await send('discard', { file: state.selectedFile });
+            const action = isUntracked ? 'discard-untracked' : 'discard';
+            await send(action, { file: state.selectedFile });
             clearDiff();
-            toast('Changes discarded', 'info');
+            toast(isUntracked ? 'File deleted' : 'Changes discarded', 'info');
           } catch (err) {
             toast(err.error || 'Discard failed', 'error');
           }

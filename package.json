@@ -8,7 +8,7 @@
   },
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js --dev"
+    "dev": "node --watch server.js"
   },
   "keywords": ["git", "gui", "ui", "lightweight", "fast"],
   "license": "MIT",

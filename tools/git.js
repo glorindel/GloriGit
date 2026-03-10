@@ -70,12 +70,29 @@ async function getStatus() {
         result.ahead = parseInt(match[1]);
         result.behind = parseInt(match[2]);
       }
-    } else if (line.startsWith('1 ') || line.startsWith('2 ')) {
-      // Changed entry
-      const parts = line.split('\t');
-      const info = parts[0].split(' ');
-      const xy = info[1]; // XY status codes
-      const filePath = parts[parts.length - 1];
+    } else if (line.startsWith('1 ')) {
+      // Ordinary changed entry: "1 XY sub mH mI mW hH hI path"
+      // All space-separated, path is field index 8+
+      const fields = line.split(' ');
+      const xy = fields[1];
+      const filePath = fields.slice(8).join(' '); // handles paths with spaces
+
+      const stagedStatus = xy[0];
+      const unstagedStatus = xy[1];
+
+      if (stagedStatus !== '.') {
+        result.staged.push({ file: filePath, status: stagedStatus });
+      }
+      if (unstagedStatus !== '.') {
+        result.unstaged.push({ file: filePath, status: unstagedStatus });
+      }
+    } else if (line.startsWith('2 ')) {
+      // Renamed/copied entry: "2 XY sub mH mI mW hH hI Xscore path\torigPath"
+      // Tab separates new path from original path
+      const tabParts = line.split('\t');
+      const fields = tabParts[0].split(' ');
+      const xy = fields[1];
+      const filePath = fields.slice(9).join(' '); // new path
 
       const stagedStatus = xy[0];
       const unstagedStatus = xy[1];
@@ -296,10 +313,10 @@ async function unstage(files) {
 }
 
 /**
- * Stage all files
+ * Stage all modified/deleted files (tracked only)
  */
 async function stageAll() {
-  return git(['add', '-A']);
+  return git(['add', '-u']);
 }
 
 /**
@@ -368,10 +385,24 @@ async function merge(branch) {
 }
 
 /**
- * Discard changes to a file (checkout from HEAD)
+ * Discard changes to a tracked file (checkout from HEAD)
  */
 async function discardFile(file) {
   return git(['checkout', '--', file]);
+}
+
+/**
+ * Delete an untracked file
+ */
+async function deleteUntrackedFile(file) {
+  const fs = require('fs');
+  const fullPath = path.join(repoPath, file);
+  return new Promise((resolve, reject) => {
+    fs.unlink(fullPath, (err) => {
+      if (err) reject({ message: `Failed to delete ${file}: ${err.message}` });
+      else resolve();
+    });
+  });
 }
 
 /**
@@ -421,6 +452,7 @@ module.exports = {
   deleteBranch,
   merge,
   discardFile,
+  deleteUntrackedFile,
   getRepoName,
   isGitRepo
 };
