@@ -79,6 +79,7 @@ function bindEvents() {
     try {
       await send('push');
       toast('Pushed successfully', 'success');
+      dom.refreshBtn.click();
     } catch (err) {
       toast(err.error || 'Push failed', 'error');
     }
@@ -247,10 +248,8 @@ function bindEvents() {
 
     // Ctrl+R = Refresh
     if ((e.ctrlKey || e.metaKey) && e.key === 'r') {
-      if (document.activeElement.tagName !== 'INPUT') {
-        e.preventDefault();
-        dom.refreshBtn.click();
-      }
+      e.preventDefault();
+      dom.refreshBtn.click();
     }
 
     // ↑ ↓ = Navigate commit log

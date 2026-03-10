@@ -49,9 +49,20 @@ function branchColor(name) {
 
 // ─── Graph Layout Engine ───────────────────────────────────────
 // Produces a structured layout: nodes[] and edges[]
-function computeGraphLayout(log) {
-  const hashIndex = new Map();
-  log.forEach((c, i) => hashIndex.set(c.hash, i));
+export function computeGraphLayout(log) {
+  const hashIndex = new Map(log.map((c, i) => [c.hash, i]));
+
+  // Determine which commits are "pushed" (have a remote ref or are ancestors of pushed commits)
+  const pushedHashes = new Set();
+  log.forEach(commit => {
+    const hasRemote = commit.refs.some(r => r.startsWith('origin/') || r.includes('/'));
+    if (hasRemote) pushedHashes.add(commit.hash);
+    
+    // Propagate pushed status to parents as we go from newest to oldest
+    if (pushedHashes.has(commit.hash) && commit.parents) {
+      commit.parents.forEach(p => pushedHashes.add(p));
+    }
+  });
 
   // Track allocation: each "track" (column) holds a hash being propagated downward
   const activeTracks = [];
@@ -106,7 +117,8 @@ function computeGraphLayout(log) {
             fromTrack: track,
             toTrack: track,
             color,
-            isMerge: false
+            isMerge: false,
+            isUnpushed: !pushedHashes.has(commit.hash)
           });
         } else {
           // Merge parent: find or allocate track
@@ -129,7 +141,8 @@ function computeGraphLayout(log) {
             fromTrack: track,
             toTrack: mergeTrack,
             color: mergeColor,
-            isMerge: true
+            isMerge: true,
+            isUnpushed: !pushedHashes.has(commit.hash)
           });
         }
       });
@@ -335,7 +348,7 @@ function drawCommitGraph() {
     ctx.globalAlpha = alpha;
     ctx.lineWidth = edge.isMerge ? 2.5 : 2;
     ctx.lineCap = 'round';
-    ctx.strokeStyle = edge.color;
+    ctx.strokeStyle = edge.isUnpushed ? '#ffffff' : edge.color;
 
     if (edge.isMerge) {
       ctx.setLineDash([4, 3]);
