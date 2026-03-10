@@ -385,6 +385,9 @@ function drawCommitGraph() {
   graphData.nodes.forEach(node => {
     const x = getX(node.track);
     const y = getY(node.index);
+    node.renderX = x;
+    node.renderY = y;
+    
     const nodeRadius = node.isMerge ? 5 : 4;
 
     // Dim non-highlighted branches
@@ -448,14 +451,14 @@ function drawCommitGraph() {
   });
 
   // Setup hover tooltip
-  setupCanvasInteraction(canvas, getX, getY);
+  setupCanvasInteraction(canvas);
 }
 
 // ─── Canvas Interaction (Hover + Click) ────────────────────────
 let tooltipEl = null;
 let activeHover = -1;
 
-function setupCanvasInteraction(canvas, getX, getY) {
+function setupCanvasInteraction(canvas) {
   // Enable pointer events on canvas for interaction
   canvas.style.pointerEvents = 'auto';
 
@@ -476,8 +479,10 @@ function setupCanvasInteraction(canvas, getX, getY) {
     let closest = -1;
     let closestDist = Infinity;
     graphData.nodes.forEach(node => {
-      const nx = getX(node.track);
-      const ny = getY(node.index);
+      const nx = node.renderX;
+      const ny = node.renderY;
+      if (nx === undefined || ny === undefined) return;
+      
       const d = Math.hypot(mx - nx, my - ny);
       if (d < 12 && d < closestDist) {
         closestDist = d;
@@ -487,11 +492,12 @@ function setupCanvasInteraction(canvas, getX, getY) {
 
     if (closest >= 0 && closest !== activeHover) {
       activeHover = closest;
-      const c = graphData.nodes[closest].commit;
+      const node = graphData.nodes[closest];
+      const c = node.commit;
       const typeIcon = c.parents.length > 1 ? '⑂ Merge' : '●';
-      const tagBadges = graphData.nodes[closest].tags.map(t => `<span class="tt-tag">🏷 ${escapeHtml(t)}</span>`).join('');
+      const tagBadges = node.tags.map(t => `<span class="tt-tag">🏷 ${escapeHtml(t)}</span>`).join('');
       tooltipEl.innerHTML = `
-        <div class="tt-hash">${escapeHtml(c.shortHash)} ${tagBadges}</div>
+        <div class="tt-hash" style="color: ${node.color}">${escapeHtml(c.shortHash)} ${tagBadges}</div>
         <div class="tt-msg">${escapeHtml(c.message)}</div>
         <div class="tt-meta">${escapeHtml(c.author)} · ${getTimeAgo(c.date)} · ${typeIcon}</div>
       `;
