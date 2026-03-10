@@ -37,9 +37,9 @@
 - [x] README.md documentation
 - [x] .gitignore
 
-## Phase 6: The Historian (Commit Inspection)
-- [ ] Commit file browser (modified/added/deleted)
-- [ ] Back-in-time diff (click file in past commit to see diff)
+## Phase 6: The Historian (Commit Inspection) ✅
+- [x] Commit file browser (modified/added/deleted)
+- [x] Back-in-time diff (click file in past commit to see diff)
 
 ## Phase 7: Conflict Warzone (Advanced Merging)
 - [ ] Visual Conflict Resolver
