@@ -10,20 +10,35 @@
 - **Dark theme** — Cyberpunk Control Room aesthetic
 - **Full Git workflow** — Status, diff, stage, commit, push, pull, branches
 
-## Quick Start
+## Installation
+
+You can install GloriGit globally to make the `glorigit` command available anywhere on your system:
 
 ```bash
-cd your-repo
+npm install -g glorigit
+```
+
+## Usage
+
+Simply run `glorigit` inside any git repository:
+
+```bash
+cd your-project-folder
+glorigit
+```
+
+You can also run it without installing it via npx:
+```bash
 npx glorigit
 ```
 
-Or clone and run:
+Or clone and run locally:
 
 ```bash
 git clone https://github.com/yourname/glorigit.git
 cd glorigit
 npm install
-npm start
+npm run dev
 ```
 
 ## Keyboard Shortcuts

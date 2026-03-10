@@ -6,33 +6,33 @@
 - [x] Define data schemas & behavioral rules
 - [/] Implementation plan → awaiting approval
 
-## Phase 1: Blueprint (Build Foundation)
-- [ ] Initialize `package.json` with minimal deps
-- [ ] Build `tools/git.js` — git command executor
-- [ ] Build `server.js` — HTTP + WebSocket server
-- [ ] Create architecture SOP
+## Phase 1: Blueprint (Build Foundation) ✅
+- [x] Initialize `package.json` with minimal deps
+- [x] Build `tools/git.js` — git command executor
+- [x] Build `server.js` — HTTP + WebSocket server
+- [x] Create architecture SOP
 
-## Phase 2: Link (Verify Connectivity)
-- [ ] Test git commands via child_process
-- [ ] Verify WebSocket handshake
+## Phase 2: Link (Verify Connectivity) ✅
+- [x] Test git commands via child_process
+- [x] Verify WebSocket handshake
 
-## Phase 3: Architect (Core UI)
-- [ ] HTML layout with all panels
-- [ ] CSS dark theme design system
-- [ ] Status panel (staged/unstaged/untracked files)
-- [ ] Diff viewer with syntax coloring
-- [ ] Commit panel
-- [ ] Branch switcher/creator
-- [ ] Log/history viewer (paginated)
-- [ ] Push/Pull controls
+## Phase 3: Architect (Core UI) ✅
+- [x] HTML layout with all panels
+- [x] CSS dark theme design system
+- [x] Status panel (staged/unstaged/untracked files)
+- [x] Diff viewer with syntax coloring
+- [x] Commit panel
+- [x] Branch switcher/creator
+- [x] Log/history viewer (paginated)
+- [x] Push/Pull controls
 
-## Phase 4: Stylize (Polish)
-- [ ] Micro-animations & transitions
-- [ ] Keyboard shortcuts
-- [ ] Error toasts & confirmations
-- [ ] Responsive layout
+## Phase 4: Stylize (Polish) ✅
+- [x] Micro-animations & transitions
+- [x] Keyboard shortcuts
+- [x] Error toasts & confirmations
+- [x] Responsive layout
 
 ## Phase 5: Trigger (Ship)
-- [ ] CLI launcher (bin field)
+- [/] CLI launcher (bin field)
 - [ ] README.md documentation
 - [ ] .gitignore
