@@ -213,17 +213,23 @@ function renderLogEntries(log) {
 
     let refsHtml = '';
     if (branchRefs.head && branchRefs.local.length > 0) {
-      refsHtml += `<span class="log-ref ref-head">${escapeHtml(branchRefs.local[0])}</span>`;
+      const bc = branchColor(branchRefs.local[0]);
+      refsHtml += `<span class="log-ref ref-head" style="background:${bc};border-color:${bc};color:#0c1018">${escapeHtml(branchRefs.local[0])}</span>`;
       branchRefs.local.slice(1).forEach(b => {
-        refsHtml += `<span class="log-ref ref-local">${escapeHtml(b)}</span>`;
+        const c = branchColor(b);
+        refsHtml += `<span class="log-ref ref-local" style="background:${c};border-color:${c};color:#0c1018">${escapeHtml(b)}</span>`;
       });
     } else {
       branchRefs.local.forEach(b => {
-        refsHtml += `<span class="log-ref ref-local">${escapeHtml(b)}</span>`;
+        const c = branchColor(b);
+        refsHtml += `<span class="log-ref ref-local" style="background:${c};border-color:${c};color:#0c1018">${escapeHtml(b)}</span>`;
       });
     }
     branchRefs.remote.forEach(b => {
-      refsHtml += `<span class="log-ref ref-remote">${escapeHtml(b)}</span>`;
+      // Strip "origin/" prefix to match the local branch color
+      const baseName = b.replace(/^origin\//, '');
+      const c = branchColor(baseName);
+      refsHtml += `<span class="log-ref ref-remote" style="color:${c};border-color:${c}">${escapeHtml(b)}</span>`;
     });
     branchRefs.tags.forEach(t => {
       refsHtml += `<span class="log-ref ref-tag">🏷 ${escapeHtml(t)}</span>`;

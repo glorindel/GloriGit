@@ -281,22 +281,17 @@
 }
 
 .log-ref.ref-head {
-  background: linear-gradient(135deg, rgba(34, 211, 238, 0.2), rgba(167, 139, 250, 0.2));
-  color: var(--accent-text);
-  border: 1px solid rgba(34, 211, 238, 0.3);
-  font-weight: 600;
+  font-weight: 700;
+  letter-spacing: 0.3px;
 }
 
 .log-ref.ref-local {
-  background: var(--accent-glow);
-  color: var(--accent-dim);
-  border: 1px solid rgba(34, 211, 238, 0.15);
+  font-weight: 600;
 }
 
 .log-ref.ref-remote {
-  background: rgba(167, 139, 250, 0.1);
-  color: var(--purple);
-  border: 1px solid rgba(167, 139, 250, 0.15);
+  background: transparent;
+  border: 1px solid;
 }
 
 .log-ref.ref-tag {
