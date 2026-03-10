@@ -1,0 +1,172 @@
+/* ============================================
+   GloriGit — Diff Panel Styles
+   Diff Viewer, Hunks, Line Types
+   ============================================ */
+
+#diffPanel {
+  flex: 1;
+  min-width: 0;
+  background: var(--bg-deep);
+  overflow: hidden;
+}
+
+.diff-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  background: var(--bg-base);
+  border-bottom: 1px solid var(--border);
+  min-height: 40px;
+}
+
+.diff-filename {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.diff-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.diff-action-btn {
+  padding: 4px 12px;
+  font-size: 11px;
+  font-weight: 500;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-raised);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--speed-fast);
+}
+
+.diff-action-btn:hover {
+  background: var(--accent-glow);
+  border-color: var(--accent-dim);
+  color: var(--accent-text);
+}
+
+.diff-action-btn.danger:hover {
+  background: var(--red-dim);
+  border-color: rgba(248, 113, 113, 0.3);
+  color: var(--red);
+}
+
+.diff-content {
+  overflow: auto;
+  flex: 1;
+  padding: 0;
+}
+
+.diff-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--text-muted);
+  gap: 12px;
+}
+
+.diff-empty-icon {
+  font-size: 48px;
+  opacity: 0.3;
+}
+
+.diff-empty p {
+  font-size: 13px;
+}
+
+/* Diff hunk */
+.diff-hunk {
+  margin: 0;
+}
+
+.diff-hunk-header {
+  padding: 6px 16px;
+  background: var(--bg-overlay);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text-muted);
+  border-top: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-subtle);
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+
+.diff-line {
+  display: flex;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  line-height: 1.6;
+  min-height: 20px;
+  border-left: 3px solid transparent;
+  transition: background var(--speed-fast);
+  animation: fade-in 0.4s var(--ease) backwards;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.diff-content > .diff-hunk:nth-child(1) .diff-line { animation-delay: 50ms; }
+.diff-content > .diff-hunk:nth-child(2) .diff-line { animation-delay: 100ms; }
+
+.diff-line:hover {
+  filter: brightness(1.15);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.diff-line-num {
+  width: 50px;
+  padding: 0 8px;
+  text-align: right;
+  color: var(--text-muted);
+  user-select: none;
+  flex-shrink: 0;
+  font-size: 11px;
+  opacity: 0.5;
+}
+
+.diff-line-content {
+  flex: 1;
+  padding: 0 16px 0 8px;
+  white-space: pre;
+  overflow-x: auto;
+  min-width: 0;
+}
+
+/* Diff line types */
+.diff-line.addition {
+  background: var(--green-dim);
+  border-left-color: var(--green);
+}
+
+.diff-line.addition .diff-line-content {
+  color: var(--green);
+}
+
+.diff-line.deletion {
+  background: var(--red-dim);
+  border-left-color: var(--red);
+}
+
+.diff-line.deletion .diff-line-content {
+  color: var(--red);
+}
+
+.diff-line.context {
+  background: transparent;
+}
+
+.diff-line.context .diff-line-content {
+  color: var(--text-secondary);
+}

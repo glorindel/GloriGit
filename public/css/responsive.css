@@ -1,0 +1,80 @@
+/* ============================================
+   GloriGit — Responsive Layout & Loading States
+   ============================================ */
+
+/* --- Loading States --- */
+.loading {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, var(--bg-overlay) 25%, var(--bg-active) 50%, var(--bg-overlay) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--radius-sm);
+}
+
+/* --- Responsive: Tablets & Mobile --- */
+@media (max-width: 768px) {
+  :root {
+    --sidebar-width: 200px;
+  }
+
+  #app-header {
+    height: auto;
+    padding: 10px 16px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .header-center {
+    order: 3;
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .branch-btn {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .branch-dropdown {
+    width: calc(100vw - 32px);
+  }
+
+  #app-main {
+    flex-direction: column;
+  }
+
+  #statusPanel {
+    width: 100% !important;
+    height: 35vh;
+    min-width: unset;
+    max-width: unset;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    resize: vertical;
+  }
+
+  .commit-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .commit-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .repo-path { display: none; }
+
+  .header-action span {
+    display: none;
+  }
+}

@@ -1,0 +1,302 @@
+/* ============================================
+   GloriGit — Header Styles
+   Logo, Repo Info, Branch Control, Sync, Actions
+   ============================================ */
+
+#app-header {
+  height: var(--header-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  background: var(--bg-base);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  z-index: 100;
+  gap: 16px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+.logo-icon {
+  font-size: 18px;
+  filter: drop-shadow(0 0 8px var(--accent));
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { filter: drop-shadow(0 0 4px rgba(34, 211, 238, 0.4)); }
+  50% { filter: drop-shadow(0 0 12px rgba(34, 211, 238, 0.8)); }
+}
+
+.logo-text {
+  background: linear-gradient(135deg, var(--accent-text), var(--purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.repo-info {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+
+.repo-name {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.repo-path {
+  font-size: 11px;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 200px;
+}
+
+/* --- Header center: Branch --- */
+.header-center {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.branch-control {
+  position: relative;
+}
+
+.branch-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all var(--speed-fast) var(--ease);
+  white-space: nowrap;
+}
+
+.branch-btn:hover {
+  background: var(--bg-overlay);
+  border-color: var(--accent-dim);
+}
+
+.branch-btn .chevron {
+  transition: transform var(--speed-fast) var(--ease);
+}
+
+.branch-control.open .branch-btn .chevron {
+  transform: rotate(180deg);
+}
+
+.branch-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 260px;
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+  z-index: 200;
+  display: none;
+  overflow: hidden;
+  animation: dropdown-enter var(--speed-normal) var(--ease-bounce);
+}
+
+@keyframes dropdown-enter {
+  from { opacity: 0; transform: translateX(-50%) translateY(-8px) scale(0.96); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+}
+
+.branch-control.open .branch-dropdown {
+  display: block;
+}
+
+.branch-dropdown-header {
+  padding: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.branch-dropdown-header input {
+  width: 100%;
+  padding: 6px 10px;
+  background: var(--bg-base);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  outline: none;
+  transition: border-color var(--speed-fast);
+}
+
+.branch-dropdown-header input:focus {
+  border-color: var(--accent-dim);
+}
+
+.branch-list {
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 4px 0;
+}
+
+.branch-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--text-secondary);
+  transition: all var(--speed-fast);
+}
+
+.branch-item:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.branch-item.current {
+  color: var(--accent-text);
+}
+
+.branch-item.current::before {
+  content: '●';
+  margin-right: 8px;
+  font-size: 8px;
+}
+
+.branch-item .delete-branch {
+  opacity: 0;
+  background: none;
+  border: none;
+  color: var(--red);
+  cursor: pointer;
+  padding: 2px 4px;
+  font-size: 14px;
+  transition: opacity var(--speed-fast);
+}
+
+.branch-item:hover .delete-branch {
+  opacity: 1;
+}
+
+.branch-dropdown-footer {
+  padding: 6px 8px;
+  border-top: 1px solid var(--border);
+}
+
+.branch-create-btn {
+  width: 100%;
+  padding: 6px;
+  background: none;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 12px;
+  transition: all var(--speed-fast);
+}
+
+.branch-create-btn:hover {
+  color: var(--accent-text);
+  border-color: var(--accent-dim);
+}
+
+/* Sync badges */
+.sync-info {
+  display: flex;
+  gap: 4px;
+}
+
+.sync-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+}
+
+.sync-badge.ahead.has-value {
+  background: var(--green-dim);
+  color: var(--green);
+}
+
+.sync-badge.behind.has-value {
+  background: var(--red-dim);
+  color: var(--red);
+}
+
+/* --- Header right --- */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.header-action {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-family: 'Outfit', sans-serif;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all var(--speed-fast) var(--ease);
+  white-space: nowrap;
+}
+
+.header-action:hover {
+  background: var(--bg-raised);
+  color: var(--text-primary);
+  border-color: var(--accent-dim);
+  box-shadow: 0 0 10px var(--accent-glow);
+  transform: translateY(-1px);
+}
+
+.header-action.push {
+  background: var(--accent-dim);
+  border-color: transparent;
+  color: var(--accent-text);
+}
+
+.header-action.push:hover {
+  background: var(--accent);
+  color: var(--text-inverse);
+  box-shadow: 0 0 15px rgba(34, 211, 238, 0.4);
+}

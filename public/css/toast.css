@@ -1,0 +1,57 @@
+/* ============================================
+   GloriGit — Toast Notifications
+   ============================================ */
+
+.toast-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 8px;
+}
+
+.toast {
+  padding: 10px 16px;
+  border-radius: var(--radius-md);
+  font-size: 12px;
+  font-weight: 500;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  animation: toast-in var(--speed-normal) var(--ease-bounce);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 360px;
+}
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(12px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.toast.toast-exit {
+  animation: toast-out var(--speed-fast) var(--ease) forwards;
+}
+
+@keyframes toast-out {
+  to { opacity: 0; transform: translateY(-8px) scale(0.95); }
+}
+
+.toast.success {
+  background: linear-gradient(135deg, #064e3b, #065f46);
+  border: 1px solid rgba(52, 211, 153, 0.2);
+  color: var(--green);
+}
+
+.toast.error {
+  background: linear-gradient(135deg, #4a0e0e, #5c1414);
+  border: 1px solid rgba(248, 113, 113, 0.2);
+  color: var(--red);
+}
+
+.toast.info {
+  background: linear-gradient(135deg, #0c2340, #0e3055);
+  border: 1px solid rgba(34, 211, 238, 0.2);
+  color: var(--accent-text);
+}

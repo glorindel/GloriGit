@@ -1,0 +1,87 @@
+/* ============================================
+   GloriGit — Historian Styles
+   Commit View, Back Button, Commit Info
+   ============================================ */
+
+.commit-view-header {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--bg-raised);
+}
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  gap: 8px;
+  background: var(--bg-overlay);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--speed-fast);
+  padding: 10px 16px;
+  border-radius: var(--radius-md);
+}
+
+.back-btn:hover {
+  color: var(--accent-text);
+  background: var(--bg-hover);
+  border-color: var(--accent-dim);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px var(--shadow-color);
+}
+
+.commit-info {
+  padding: 16px 14px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-base);
+}
+
+.commit-info-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+}
+
+.commit-info-hash {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: var(--accent-text);
+  font-weight: 600;
+}
+
+.commit-info-date {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.commit-info-author {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.commit-info-author::before {
+  content: '';
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  background: var(--bg-active);
+  border-radius: 50%;
+}
+
+.commit-info-message {
+  font-size: 13px;
+  color: var(--text-primary);
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+}

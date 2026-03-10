@@ -1,0 +1,207 @@
+/* ============================================
+   GloriGit — Footer Styles
+   Commit Bar, Log Bar, Commit Graph, Log Entries
+   ============================================ */
+
+#app-footer {
+  background: var(--bg-base);
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.commit-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.commit-input-wrap {
+  flex: 1;
+  position: relative;
+}
+
+.commit-input-wrap input {
+  width: 100%;
+  padding: 8px 60px 8px 14px;
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-family: 'Outfit', sans-serif;
+  font-size: 13px;
+  outline: none;
+  transition: border-color var(--speed-fast);
+}
+
+.commit-input-wrap input:focus {
+  border-color: var(--accent-dim);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.commit-input-wrap input::placeholder {
+  color: var(--text-muted);
+}
+
+.commit-char-count {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.commit-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 20px;
+  background: var(--accent);
+  border: none;
+  border-radius: var(--radius-md);
+  color: var(--text-inverse);
+  font-family: 'Outfit', sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all var(--speed-fast) var(--ease);
+  white-space: nowrap;
+}
+
+.commit-btn:hover:not(:disabled) {
+  background: var(--accent-text);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(34, 211, 238, 0.3);
+}
+
+.commit-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.commit-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* --- Log Bar --- */
+.log-bar {
+  max-height: 40px;
+  overflow: hidden;
+  transition: max-height var(--speed-slow) var(--ease);
+}
+
+.log-bar.expanded {
+  max-height: 300px;
+}
+
+.log-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+  user-select: none;
+  transition: color var(--speed-fast);
+}
+
+.log-toggle:hover {
+  color: var(--text-primary);
+}
+
+.log-toggle .chevron {
+  transition: transform var(--speed-fast) var(--ease);
+}
+
+.log-bar.expanded .log-toggle .chevron {
+  transform: rotate(180deg);
+}
+
+.log-entries {
+  overflow-y: auto;
+  max-height: 250px;
+  padding: 0 8px 8px;
+  position: relative;
+}
+
+.commit-graph {
+  position: absolute;
+  top: 0;
+  left: 8px;
+  width: 60px;
+  z-index: 2; /* Bring to front so it's above row hover backgrounds */
+  pointer-events: none;
+}
+
+.log-entry {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 8px 6px 72px; /* Left padding makes room for the canvas graph */
+  border-radius: var(--radius-sm);
+  transition: background var(--speed-fast);
+  cursor: pointer; /* Historian makes this clickable */
+  position: relative;
+  z-index: 1;
+}
+
+.log-entry:hover {
+  background: var(--bg-hover);
+}
+
+.log-hash {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--accent-dim);
+  flex-shrink: 0;
+  width: 60px;
+}
+
+.log-message {
+  flex: 1;
+  font-size: 12px;
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.log-refs {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.log-ref {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+  background: var(--accent-glow);
+  color: var(--accent-dim);
+  border: 1px solid rgba(34, 211, 238, 0.15);
+}
+
+.log-author {
+  font-size: 11px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.log-date {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  opacity: 0.6;
+}

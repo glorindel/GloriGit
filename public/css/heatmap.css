@@ -1,0 +1,57 @@
+/* ============================================
+   GloriGit — Heatmap UI
+   Grid, Cells, Author Labels
+   ============================================ */
+
+.heatmap-scroll-container {
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+
+.heatmap-grid {
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: repeat(7, 1fr);
+  gap: 3px;
+  width: max-content;
+}
+
+.heatmap-cell {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  background: var(--bg-hover);
+  transition: transform var(--speed-fast);
+  cursor: pointer;
+}
+
+.heatmap-cell:hover {
+  transform: scale(1.3);
+  z-index: 10;
+  position: relative;
+}
+
+.heatmap-cell.level-1 { background: rgba(34, 211, 238, 0.2); }
+.heatmap-cell.level-2 { background: rgba(34, 211, 238, 0.4); }
+.heatmap-cell.level-3 { background: rgba(34, 211, 238, 0.7); }
+.heatmap-cell.level-4 { background: rgba(34, 211, 238, 1.0); box-shadow: 0 0 8px rgba(34, 211, 238, 0.5); }
+
+.heatmap-author-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.heatmap-total-badge {
+  font-size: 11px;
+  color: var(--accent-dim);
+  font-weight: 500;
+  font-family: 'JetBrains Mono', monospace;
+  background: var(--accent-glow);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+}
