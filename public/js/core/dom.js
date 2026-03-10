@@ -84,6 +84,12 @@ export const dom = {
   // Canvas Graph
   commitGraph: $('commitGraph'),
 
+  // Graph Search & Filters
+  graphSearch: $('graphSearch'),
+  filterAuthor: $('filterAuthor'),
+  filterBranch: $('filterBranch'),
+  clearFiltersBtn: $('clearFiltersBtn'),
+
   // Heatmap Modal
   heatmapBtn: $('heatmapBtn'),
   heatmapModalOverlay: $('heatmapModalOverlay'),

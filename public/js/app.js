@@ -15,6 +15,7 @@ import { clearDiff } from './modules/diff.js';
 import { closeCommitView } from './modules/historian.js';
 import { closeFileHistoryView } from './modules/timemachine.js';
 import { loadHeatmap } from './modules/heatmap.js';
+import { navigateLog, openSelectedCommit, searchCommit, applyFilters, clearFilters, clearHighlight, redrawGraph } from './modules/log.js';
 
 function bindEvents() {
   // Commit View Back Button
@@ -143,6 +144,10 @@ function bindEvents() {
   // Log toggle
   dom.logToggle.addEventListener('click', () => {
     dom.logBar.classList.toggle('expanded');
+    // Redraw graph after CSS transition ends so entries have correct layout
+    if (dom.logBar.classList.contains('expanded')) {
+      setTimeout(() => redrawGraph(), 400);
+    }
   });
 
   // Modal
@@ -172,6 +177,33 @@ function bindEvents() {
   dom.heatmapModalClose.addEventListener('click', () => dom.heatmapModalOverlay.classList.remove('active'));
   dom.heatmapModalOverlay.addEventListener('click', (e) => {
     if (e.target === dom.heatmapModalOverlay) dom.heatmapModalOverlay.classList.remove('active');
+  });
+
+  // Graph search
+  let searchDebounce = null;
+  dom.graphSearch.addEventListener('input', () => {
+    clearTimeout(searchDebounce);
+    searchDebounce = setTimeout(() => {
+      searchCommit(dom.graphSearch.value);
+    }, 200);
+  });
+
+  // Graph filters
+  let filterDebounce = null;
+  dom.filterAuthor.addEventListener('input', () => {
+    clearTimeout(filterDebounce);
+    filterDebounce = setTimeout(() => {
+      applyFilters({ author: dom.filterAuthor.value.trim() });
+    }, 400);
+  });
+  dom.filterBranch.addEventListener('change', () => {
+    applyFilters({ branch: dom.filterBranch.value });
+  });
+  dom.clearFiltersBtn.addEventListener('click', () => {
+    dom.graphSearch.value = '';
+    dom.filterAuthor.value = '';
+    dom.filterBranch.value = '';
+    clearFilters();
   });
 
   // Keyboard shortcuts
@@ -217,6 +249,21 @@ function bindEvents() {
         e.preventDefault();
         dom.refreshBtn.click();
       }
+    }
+
+    // ↑ ↓ = Navigate commit log
+    if (e.key === 'ArrowDown' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'SELECT') {
+      e.preventDefault();
+      navigateLog('down');
+    }
+    if (e.key === 'ArrowUp' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'SELECT') {
+      e.preventDefault();
+      navigateLog('up');
+    }
+
+    // Enter on selected commit = open historian
+    if (e.key === 'Enter' && !e.ctrlKey && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'BUTTON') {
+      openSelectedCommit();
     }
   });
 }

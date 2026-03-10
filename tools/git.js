@@ -114,13 +114,33 @@ async function getStatus() {
 /**
  * Get commit log (paginated)
  */
-async function getLog(count = 50, skip = 0) {
+async function getLog(count = 50, skip = 0, filters = {}) {
   const format = '--format={"hash":"%H","shortHash":"%h","author":"%an","email":"%ae","date":"%aI","message":"%s","refs":"%D","parents":"%P"}';
-  const output = await git([
+  const args = [
     'log', format,
+    '--all',
     `--max-count=${count}`,
     `--skip=${skip}`
-  ]);
+  ];
+
+  // Optional filters
+  if (filters.branch) {
+    // Remove --all and target specific branch
+    const allIdx = args.indexOf('--all');
+    if (allIdx !== -1) args.splice(allIdx, 1);
+    args.push(filters.branch);
+  }
+  if (filters.author) {
+    args.push(`--author=${filters.author}`);
+  }
+  if (filters.since) {
+    args.push(`--since=${filters.since}`);
+  }
+  if (filters.until) {
+    args.push(`--until=${filters.until}`);
+  }
+
+  const output = await git(args);
 
   const lines = output.trim().split('\n').filter(Boolean);
   return lines.map(line => {

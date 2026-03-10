@@ -159,7 +159,11 @@ wss.on('connection', (ws) => {
           result = await gitEngine.getStatus();
           break;
         case 'log':
-          result = await gitEngine.getLog(payload?.count || 50, payload?.skip || 0);
+          result = await gitEngine.getLog(
+            payload?.count || 50,
+            payload?.skip || 0,
+            { branch: payload?.branch, author: payload?.author, since: payload?.since, until: payload?.until }
+          );
           break;
         case 'branches':
           result = await gitEngine.getBranches();

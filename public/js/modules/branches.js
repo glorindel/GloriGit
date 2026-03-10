@@ -12,6 +12,15 @@ export function renderBranches(branches) {
   state.branches = branches;
   dom.currentBranch.textContent = branches.current || 'detached';
   renderBranchList();
+
+  // Populate graph filter dropdown
+  if (dom.filterBranch) {
+    const current = dom.filterBranch.value;
+    dom.filterBranch.innerHTML = '<option value="">All Branches</option>';
+    branches.local.forEach(b => {
+      dom.filterBranch.innerHTML += `<option value="${b}" ${b === current ? 'selected' : ''}>${b}</option>`;
+    });
+  }
 }
 
 export function renderBranchList(filter = '') {
