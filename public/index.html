@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GloriGit</title>
+  <meta name="description" content="Super lightweight, blazing-fast Git UI">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <!-- Header -->
+  <header id="app-header">
+    <div class="header-left">
+      <div class="logo" id="logo">
+        <span class="logo-icon">⚡</span>
+        <span class="logo-text">GloriGit</span>
+      </div>
+      <div class="repo-info">
+        <span class="repo-name" id="repoName">Loading...</span>
+        <span class="repo-path" id="repoPath"></span>
+      </div>
+    </div>
+    <div class="header-center">
+      <div class="branch-control" id="branchControl">
+        <button class="branch-btn" id="branchBtn" title="Switch branch">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M5 5.372v.878c0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75v-.878a2.25 2.25 0 1 1 1.5 0v.878a2.25 2.25 0 0 1-2.25 2.25h-1.5v2.128a2.251 2.251 0 1 1-1.5 0V5.372a2.25 2.25 0 1 1 1.5 0ZM7.25 10.75a.75.75 0 1 0 1.5 0 .75.75 0 0 0-1.5 0Zm-2-6a.75.75 0 1 0 1.5 0 .75.75 0 0 0-1.5 0Zm5.5 0a.75.75 0 1 0 1.5 0 .75.75 0 0 0-1.5 0Z"/>
+          </svg>
+          <span id="currentBranch">main</span>
+          <svg class="chevron" width="10" height="10" viewBox="0 0 10 10" fill="currentColor">
+            <path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" stroke-width="1.5" fill="none"/>
+          </svg>
+        </button>
+        <div class="branch-dropdown" id="branchDropdown">
+          <div class="branch-dropdown-header">
+            <input type="text" id="branchSearch" placeholder="Find or create branch..." autocomplete="off">
+          </div>
+          <div class="branch-list" id="branchList"></div>
+          <div class="branch-dropdown-footer">
+            <button class="branch-create-btn" id="branchCreateBtn">
+              <span>+</span> Create branch
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="sync-info">
+        <span class="sync-badge ahead" id="aheadBadge" title="Commits ahead">↑0</span>
+        <span class="sync-badge behind" id="behindBadge" title="Commits behind">↓0</span>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="header-action" id="pullBtn" title="Pull">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M7.5 1v9.793L4.354 7.646l-.708.708L8 12.707l4.354-4.353-.708-.708L8.5 10.793V1h-1Z"/>
+          <path d="M1 13v2h14v-2H1Z"/>
+        </svg>
+        <span>Pull</span>
+      </button>
+      <button class="header-action push" id="pushBtn" title="Push">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M8.5 14V4.207l3.146 3.147.708-.708L8 2.293 3.646 6.646l.708.708L7.5 4.207V14h1Z"/>
+          <path d="M1 1v2h14V1H1Z"/>
+        </svg>
+        <span>Push</span>
+      </button>
+      <button class="header-action" id="refreshBtn" title="Refresh">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M13.65 2.35a8 8 0 1 0 1.77 5.15h-2.02a6 6 0 1 1-1.27-3.63L10 6h6V0l-2.35 2.35Z"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main id="app-main">
+    <!-- Left Panel: File Status -->
+    <aside id="statusPanel" class="panel">
+      <div class="panel-section" id="stagedSection">
+        <div class="section-header">
+          <h3>
+            <span class="section-icon staged-icon">●</span>
+            Staged
+            <span class="count-badge" id="stagedCount">0</span>
+          </h3>
+          <button class="section-action" id="unstageAllBtn" title="Unstage all">−</button>
+        </div>
+        <ul class="file-list" id="stagedFiles"></ul>
+      </div>
+
+      <div class="panel-section" id="unstagedSection">
+        <div class="section-header">
+          <h3>
+            <span class="section-icon modified-icon">◐</span>
+            Modified
+            <span class="count-badge" id="unstagedCount">0</span>
+          </h3>
+          <button class="section-action" id="stageAllBtn" title="Stage all">+</button>
+        </div>
+        <ul class="file-list" id="unstagedFiles"></ul>
+      </div>
+
+      <div class="panel-section" id="untrackedSection">
+        <div class="section-header">
+          <h3>
+            <span class="section-icon untracked-icon">◌</span>
+            Untracked
+            <span class="count-badge" id="untrackedCount">0</span>
+          </h3>
+          <button class="section-action" id="stageAllUntrackedBtn" title="Stage all">+</button>
+        </div>
+        <ul class="file-list" id="untrackedFiles"></ul>
+      </div>
+    </aside>
+
+    <!-- Center: Diff Viewer -->
+    <section id="diffPanel" class="panel">
+      <div class="diff-header" id="diffHeader">
+        <span class="diff-filename" id="diffFilename">Select a file to view changes</span>
+        <div class="diff-actions" id="diffActions" style="display:none">
+          <button class="diff-action-btn" id="diffStageBtn">Stage</button>
+          <button class="diff-action-btn danger" id="diffDiscardBtn">Discard</button>
+        </div>
+      </div>
+      <div class="diff-content" id="diffContent">
+        <div class="diff-empty" id="diffEmpty">
+          <div class="diff-empty-icon">📂</div>
+          <p>Select a file from the sidebar to view its diff</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Bottom: Commit + Log -->
+  <footer id="app-footer">
+    <div class="commit-bar" id="commitBar">
+      <div class="commit-input-wrap">
+        <input type="text" id="commitMessage" placeholder="Commit message..." autocomplete="off" maxlength="200">
+        <span class="commit-char-count" id="charCount">0/200</span>
+      </div>
+      <button class="commit-btn" id="commitBtn" disabled>
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/>
+        </svg>
+        Commit
+      </button>
+    </div>
+    <div class="log-bar" id="logBar">
+      <div class="log-toggle" id="logToggle">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M1.5 1.75V13.5h13.75a.75.75 0 0 1 0 1.5H.75a.75.75 0 0 1-.75-.75V1.75a.75.75 0 0 1 1.5 0Zm14.28 2.53-5.25 5.25a.75.75 0 0 1-1.06 0L7 7.06 4.28 9.78a.75.75 0 0 1-1.06-1.06l3.25-3.25a.75.75 0 0 1 1.06 0L10 8.19l4.72-4.72a.75.75 0 0 1 1.06 1.06Z"/>
+        </svg>
+        <span>History</span>
+        <svg class="chevron" width="10" height="10" viewBox="0 0 10 10" fill="currentColor">
+          <path d="M2 6.5L5 3.5L8 6.5" stroke="currentColor" stroke-width="1.5" fill="none"/>
+        </svg>
+      </div>
+      <div class="log-entries" id="logEntries"></div>
+    </div>
+  </footer>
+
+  <!-- Toast notifications -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- Confirmation modal -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal" id="modal">
+      <div class="modal-header" id="modalTitle">Confirm</div>
+      <div class="modal-body" id="modalBody"></div>
+      <div class="modal-actions">
+        <button class="modal-btn cancel" id="modalCancel">Cancel</button>
+        <button class="modal-btn confirm" id="modalConfirm">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Connection status -->
+  <div class="connection-status" id="connectionStatus">
+    <span class="connection-dot"></span>
+    <span>Disconnected</span>
+  </div>
+
+  <script src="/js/app.js"></script>
+</body>
+</html>
