@@ -46,10 +46,10 @@
 - [ ] Interactive Rebase UI
 - [ ] Merge Preview
 
-## Phase 8: The Matrix (Visualization)
-- [ ] Canvas Commit Graph
-- [ ] File History Timemachine
-- [ ] Author Impact Heatmap
+## Phase 8: The Matrix (Visualization) ✅
+- [x] Canvas Commit Graph
+- [x] File History Timemachine
+- [x] Author Impact Heatmap
 
 ## Phase 9: Deep Storage (Stashes & Remotes)
 - [ ] Stash Manager
