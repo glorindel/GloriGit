@@ -163,7 +163,7 @@ function extractBranch(commit) {
     if (!ref.startsWith('tag:') && !ref.startsWith('origin/') && ref !== 'HEAD') return ref;
   }
   for (const ref of commit.refs) {
-    if (ref.startsWith('origin/')) return ref;
+    if (ref.startsWith('origin/')) return ref.replace(/^origin\//, '');
   }
   return '';
 }
@@ -359,10 +359,22 @@ function drawCommitGraph() {
       ctx.moveTo(fromX, fromY);
       ctx.lineTo(toX, toY);
     } else {
-      // Smooth bezier curves for branch merges
-      const midY = (fromY + toY) / 2;
+      // Go straight down the side track to the parent commit
+      const curveHeight = 30;
+      const straightTopY = Math.min(toY, fromY + curveHeight);
+      
+      // Start at the merge commit (main branch)
       ctx.moveTo(fromX, fromY);
-      ctx.bezierCurveTo(fromX, midY, toX, midY, toX, toY);
+      
+      // Curve out to the side track over 30px
+      ctx.bezierCurveTo(
+        fromX, straightTopY - (curveHeight / 2),
+        toX, straightTopY - (curveHeight / 2),
+        toX, straightTopY
+      );
+      
+      // Continue straight down the side track to the parent commit
+      ctx.lineTo(toX, toY);
     }
     ctx.stroke();
     ctx.setLineDash([]);
