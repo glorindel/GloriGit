@@ -400,7 +400,7 @@ function drawCommitGraph() {
     if (node.isTag) {
       ctx.shadowBlur = 0;
       ctx.beginPath();
-      ctx.arc(x + nodeRadius + 4, y, 2, 0, Math.PI * 2);
+      ctx.arc(x - nodeRadius - 4, y, 2, 0, Math.PI * 2);
       ctx.fillStyle = '#fbbf24';
       ctx.fill();
     }
@@ -461,7 +461,7 @@ function setupCanvasInteraction(canvas, getX, getY) {
       activeHover = closest;
       const c = graphData.nodes[closest].commit;
       const typeIcon = c.parents.length > 1 ? '⑂ Merge' : '●';
-      const tagBadges = graphData.nodes[closest].tags.map(t => `🏷 ${t}`).join(' ');
+      const tagBadges = graphData.nodes[closest].tags.map(t => `<span class="tt-tag">🏷 ${escapeHtml(t)}</span>`).join('');
       tooltipEl.innerHTML = `
         <div class="tt-hash">${escapeHtml(c.shortHash)} ${tagBadges}</div>
         <div class="tt-msg">${escapeHtml(c.message)}</div>
