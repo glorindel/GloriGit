@@ -111,9 +111,27 @@ export function computeGraphLayout(log) {
           let targetTrack = track;
           const existingTrack = activeTracks.indexOf(parentHash);
           if (existingTrack !== -1) {
-            // Parent is already owned by another track, so this branch merges in
-            targetTrack = existingTrack;
-            activeTracks[track] = parentHash;
+            if (track < existingTrack) {
+              // Current track is further left, keep it straight and merge the side track in
+              targetTrack = track;
+              activeTracks[track] = parentHash;
+              activeTracks[existingTrack] = null;
+              trackBranch[existingTrack] = null;
+              
+              const pLogIdx = hashIndex.get(parentHash);
+              if (pLogIdx !== undefined) {
+                edges.forEach(e => {
+                  if (e.toTrack === existingTrack && e.toIdx === pLogIdx) {
+                    e.toTrack = track;
+                  }
+                });
+              }
+            } else {
+              // Parent is already owned by a further-left track, so this branch merges in
+              targetTrack = existingTrack;
+              activeTracks[track] = null;
+              trackBranch[track] = null;
+            }
           } else {
             // Continue on same track
             activeTracks[track] = parentHash;
@@ -136,10 +154,8 @@ export function computeGraphLayout(log) {
             mergeTrack = activeTracks.findIndex((t, idx) => t === null && idx !== track);
             if (mergeTrack === -1) mergeTrack = activeTracks.length;
             activeTracks[mergeTrack] = parentHash;
-            if (!trackBranch[mergeTrack]) {
-              const parentBranch = findBranchForHash(parentHash, log, hashIndex);
-              trackBranch[mergeTrack] = parentBranch || `track-${mergeTrack}`;
-            }
+            const parentBranch = findBranchForHash(parentHash, log, hashIndex);
+            trackBranch[mergeTrack] = parentBranch || null;
           }
           const mergeColor = trackBranch[mergeTrack] ? branchColor(trackBranch[mergeTrack]) : BRANCH_COLORS[mergeTrack % BRANCH_COLORS.length];
 
@@ -158,6 +174,7 @@ export function computeGraphLayout(log) {
     } else {
       // Root commit: free the track
       activeTracks[track] = null;
+      trackBranch[track] = null;
     }
   });
 
