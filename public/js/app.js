@@ -837,12 +837,6 @@
       updateCommitButton();
     });
 
-    dom.commitMessage.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
-        doCommit();
-      }
-    });
-
     dom.commitBtn.addEventListener('click', doCommit);
 
     // Log toggle
