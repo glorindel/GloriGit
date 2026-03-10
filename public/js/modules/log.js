@@ -208,8 +208,9 @@ function renderLogEntries(log) {
 
     if (i === selectedIdx) div.classList.add('selected');
 
-    // Classify refs for styled badges
     const branchRefs = classifyRefs(entry.refs);
+
+    if (branchRefs.head) div.classList.add('is-head');
 
     let refsHtml = '';
     if (branchRefs.head && branchRefs.local.length > 0) {
@@ -526,12 +527,22 @@ export function navigateLog(direction) {
 
   // Redraw graph for selection ring
   requestAnimationFrame(() => drawCommitGraph());
+
+  // Auto-open commit view for the selected entry
+  openSelectedCommit();
 }
 
 export function openSelectedCommit() {
   if (selectedIdx >= 0 && state.log[selectedIdx]) {
     openCommitView(state.log[selectedIdx]);
   }
+}
+
+export function unselectCommit() {
+  selectedIdx = -1;
+  const entries = dom.logEntriesContent.querySelectorAll('.log-entry');
+  entries.forEach(el => el.classList.remove('selected'));
+  requestAnimationFrame(() => drawCommitGraph());
 }
 
 function selectCommitByIndex(idx) {

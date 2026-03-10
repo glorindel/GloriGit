@@ -7,6 +7,7 @@ import { escapeHtml, splitPath, getTimeAgo } from '../core/utils.js';
 import { send } from '../core/ws.js';
 import { toast } from '../ui/toast.js';
 import { renderDiff, clearDiff } from './diff.js';
+import { unselectCommit } from './log.js';
 
 export async function openCommitView(commit) {
   state.inspectingCommit = commit.hash;
@@ -88,4 +89,5 @@ export function closeCommitView() {
   if (state.selectedType === 'history') {
     clearDiff();
   }
+  unselectCommit();
 }

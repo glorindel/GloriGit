@@ -15,7 +15,7 @@ import { clearDiff } from './modules/diff.js';
 import { closeCommitView } from './modules/historian.js';
 import { closeFileHistoryView } from './modules/timemachine.js';
 import { loadHeatmap } from './modules/heatmap.js';
-import { navigateLog, openSelectedCommit, searchCommit, applyFilters, clearFilters, clearHighlight, redrawGraph } from './modules/log.js';
+import { navigateLog, openSelectedCommit, unselectCommit, searchCommit, applyFilters, clearFilters, clearHighlight, redrawGraph } from './modules/log.js';
 
 function bindEvents() {
   // Commit View Back Button
@@ -219,6 +219,8 @@ function bindEvents() {
       closeBranchDropdown();
       dom.helpModalOverlay.classList.remove('active');
       dom.heatmapModalOverlay.classList.remove('active');
+      unselectCommit(); // Clear log selection
+
       if (state.inspectingCommit) {
         closeCommitView();
         closeFileHistoryView();

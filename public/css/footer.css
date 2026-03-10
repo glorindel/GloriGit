@@ -249,7 +249,18 @@
   width: 60px;
 }
 
-.log-hash.search-hit {
+.log-entry.is-head .log-hash {
+  color: var(--accent-text); /* Brighter cyan */
+  font-weight: 700;
+}
+
+.log-entry.is-head .log-message {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.log-hash.search-hit,
+.log-entry.is-head .log-hash.search-hit {
   color: var(--yellow);
   font-weight: 700;
   text-shadow: 0 0 6px rgba(251, 191, 36, 0.5);
