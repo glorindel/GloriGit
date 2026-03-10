@@ -93,12 +93,17 @@ describe('Git Engine — Read Operations', () => {
       assert.ok(branches.local.length > 0, 'should have at least one local branch');
     });
 
-    it('current branch should be in local list', async () => {
+    it('current branch should be in local list (if not detached)', async () => {
       const branches = await git.getBranches();
-      assert.ok(
-        branches.local.includes(branches.current),
-        'current branch should appear in local branches'
-      );
+      if (branches.current) {
+        assert.ok(
+          branches.local.includes(branches.current),
+          'current branch should appear in local branches'
+        );
+      } else {
+        // Detached HEAD — should have at least one local branch anyway
+        assert.ok(branches.local.length > 0, 'should have local branches even if detached');
+      }
     });
   });
 

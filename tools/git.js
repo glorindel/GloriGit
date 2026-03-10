@@ -418,15 +418,20 @@ function parseDiff(diffOutput, file) {
  * Get branches (local and remote)
  */
 async function getBranches() {
-  const output = await git(['branch', '-a', '--format=%(refname:short) %(HEAD)']);
+  const output = await git(['branch', '-a', '--format=%(refname:short)|%(HEAD)']);
   const lines = output.trim().split('\n').filter(Boolean);
 
   const result = { current: '', local: [], remote: [] };
 
   for (const line of lines) {
-    const parts = line.trim().split(' ');
-    const name = parts[0];
-    const isCurrent = parts[1] === '*';
+    const [name, headIndicator] = line.trim().split('|');
+    const isCurrent = headIndicator === '*';
+
+    // Skip special git entries like "(HEAD detached at ...)"
+    if (name.startsWith('(')) {
+      if (isCurrent) result.current = ''; // Represent as detached
+      continue;
+    }
 
     if (isCurrent) result.current = name;
 

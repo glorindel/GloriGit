@@ -370,9 +370,11 @@ function drawCommitGraph() {
     ctx.save();
     ctx.globalAlpha = alpha;
 
+    const isHead = node.branchRefs.head;
+
     // Glow
     ctx.shadowBlur = 8;
-    ctx.shadowColor = node.color;
+    ctx.shadowColor = isHead ? '#ffffff' : node.color;
 
     // Outer ring
     ctx.beginPath();
@@ -380,7 +382,7 @@ function drawCommitGraph() {
     ctx.fillStyle = '#0c1018';
     ctx.fill();
     ctx.lineWidth = 2.5;
-    ctx.strokeStyle = node.color;
+    ctx.strokeStyle = isHead ? '#ffffff' : node.color;
     ctx.stroke();
 
     // Merge icon: filled diamond inside
