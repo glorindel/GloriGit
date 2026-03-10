@@ -624,6 +624,87 @@ body {
   background: var(--bg-active);
 }
 
+/* --- Commit View --- */
+.commit-view-header {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--bg-raised);
+}
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-family: 'Outfit', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--speed-fast);
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  margin-left: -8px;
+}
+
+.back-btn:hover {
+  color: var(--accent-text);
+  background: var(--bg-hover);
+  transform: translateX(-2px);
+}
+
+.commit-info {
+  padding: 16px 14px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-base);
+}
+
+.commit-info-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+}
+
+.commit-info-hash {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: var(--accent-text);
+  font-weight: 600;
+}
+
+.commit-info-date {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.commit-info-author {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.commit-info-author::before {
+  content: '';
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  background: var(--bg-active);
+  border-radius: 50%;
+}
+
+.commit-info-message {
+  font-size: 13px;
+  color: var(--text-primary);
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
 /* ============================================
    DIFF PANEL
    ============================================ */

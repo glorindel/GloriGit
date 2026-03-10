@@ -183,6 +183,44 @@ async function getDiff(file, staged = false) {
 }
 
 /**
+ * Get files modified in a specific commit
+ */
+async function getCommitFiles(hash) {
+  // Use --name-status to get A/M/D/R status and file paths for a commit
+  // The --oneline --format="" ensures we don't get the commit message itself, just the files
+  const output = await git(['show', '--name-status', '--format=', hash]);
+  const lines = output.trim().split('\n').filter(Boolean);
+  
+  return lines.map(line => {
+    // Format is like "M\tpath/to/file" or "R100\told/path\tnew/path"
+    const parts = line.split('\t');
+    const statusCode = parts[0][0]; // First letter (M, A, D, R, etc)
+    
+    // Handle renames (R status has 3 parts)
+    const file = parts.length === 3 ? parts[2] : parts[1];
+    
+    return {
+      status: statusCode,
+      file: file
+    };
+  });
+}
+
+/**
+ * Get diff for a specific file in a specific commit
+ */
+async function getCommitFileDiff(hash, file) {
+  try {
+    // git show hash:file will show full file content if we wanted it
+    // But we want the diff that happened IN that commit:
+    const output = await git(['show', hash, '--', file]);
+    return parseDiff(output, file);
+  } catch (err) {
+    return { file, hunks: [], error: err.message };
+  }
+}
+
+/**
  * Get diff for an untracked file (show full content as additions)
  */
 async function getUntrackedDiff(file) {
@@ -454,5 +492,7 @@ module.exports = {
   discardFile,
   deleteUntrackedFile,
   getRepoName,
-  isGitRepo
+  isGitRepo,
+  getCommitFiles,
+  getCommitFileDiff
 };

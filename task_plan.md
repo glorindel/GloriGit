@@ -32,7 +32,36 @@
 - [x] Error toasts & confirmations
 - [x] Responsive layout
 
-## Phase 5: Trigger (Ship)
-- [/] CLI launcher (bin field)
-- [ ] README.md documentation
-- [ ] .gitignore
+## Phase 5: Trigger (Ship) ✅
+- [x] CLI launcher (bin field)
+- [x] README.md documentation
+- [x] .gitignore
+
+## Phase 6: The Historian (Commit Inspection)
+- [ ] Commit file browser (modified/added/deleted)
+- [ ] Back-in-time diff (click file in past commit to see diff)
+
+## Phase 7: Conflict Warzone (Advanced Merging)
+- [ ] Visual Conflict Resolver
+- [ ] Interactive Rebase UI
+- [ ] Merge Preview
+
+## Phase 8: The Matrix (Visualization)
+- [ ] Canvas Commit Graph
+- [ ] File History Timemachine
+- [ ] Author Impact Heatmap
+
+## Phase 9: Deep Storage (Stashes & Remotes)
+- [ ] Stash Manager
+- [ ] Remote Control UI (origin/upstream management)
+- [ ] Tagging System
+
+## Phase 10: Operator Tools
+- [ ] Built-in Power Terminal
+- [ ] Git Cheat Sheet overlay
+- [ ] Search & Filter Highlighting
+- [ ] Command Palette (Ctrl+K)
+
+## Phase 11: Customization & Plugins
+- [ ] Theme Studio (Day/Light theme & Neon customization)
+- [ ] Web Sockets API for plugins

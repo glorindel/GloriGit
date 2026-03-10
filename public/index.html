@@ -83,9 +83,12 @@
 
   <!-- Main Content -->
   <main id="app-main">
-    <!-- Left Panel: File Status -->
+    <!-- Left Panel: File Workspace & Commit Inspector -->
     <aside id="statusPanel" class="panel">
-      <div class="panel-section" id="stagedSection">
+      
+      <!-- Workspace View (Active by Default) -->
+      <div id="workspaceView" style="display: flex; flex-direction: column; flex: 1; overflow: hidden;">
+        <div class="panel-section" id="stagedSection">
         <div class="section-header">
           <h3>
             <span class="section-icon staged-icon">●</span>
@@ -120,6 +123,38 @@
         </div>
         <ul class="file-list" id="untrackedFiles"></ul>
       </div>
+      </div> <!-- /workspaceView -->
+
+      <!-- Commit History View (Hidden by Default) -->
+      <div id="commitView" style="display: none; flex-direction: column; flex: 1; overflow: hidden;">
+        <div class="commit-view-header">
+          <button class="back-btn" id="backToWorkspaceBtn">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M6.28 3.22a.75.75 0 0 0-1.06 0L1.47 6.97a.75.75 0 0 0 0 1.06l3.75 3.75a.75.75 0 0 0 1.06-1.06L3.56 8h10.69a.75.75 0 0 0 0-1.5H3.56l2.72-2.72a.75.75 0 0 0 0-1.06Z"/>
+            </svg>
+            Back to Workspace
+          </button>
+        </div>
+        <div class="commit-info">
+          <div class="commit-info-header">
+            <span class="commit-info-hash" id="inspectCommitHash"></span>
+            <span class="commit-info-date" id="inspectCommitDate"></span>
+          </div>
+          <div class="commit-info-author" id="inspectCommitAuthor"></div>
+          <div class="commit-info-message" id="inspectCommitMessage"></div>
+        </div>
+        <div class="panel-section" style="flex: 1; display: flex; flex-direction: column; overflow: hidden; border-bottom: none;">
+          <div class="section-header">
+            <h3>
+              <span class="section-icon">📄</span>
+              Files Changed
+              <span class="count-badge" id="inspectCommitFileCount">0</span>
+            </h3>
+          </div>
+          <ul class="file-list" id="inspectCommitFiles" style="flex: 1; overflow-y: auto;"></ul>
+        </div>
+      </div> <!-- /commitView -->
+      
     </aside>
 
     <!-- Center: Diff Viewer -->

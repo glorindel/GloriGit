@@ -228,6 +228,12 @@ wss.on('connection', (ws) => {
           await gitEngine.deleteUntrackedFile(payload.file);
           result = await gitEngine.getStatus();
           break;
+        case 'commit-files':
+          result = await gitEngine.getCommitFiles(payload.hash);
+          break;
+        case 'commit-diff-file':
+          result = await gitEngine.getCommitFileDiff(payload.hash, payload.file);
+          break;
 
         default:
           ws.send(JSON.stringify({ id, error: `Unknown action: ${action}` }));
