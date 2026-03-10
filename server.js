@@ -192,14 +192,18 @@ wss.on('connection', (ws) => {
           await gitEngine.commit(payload.message);
           result = await gitEngine.getStatus();
           break;
-        case 'push':
-          await gitEngine.push(payload?.remote, payload?.branch);
+        case 'push': {
+          const currentBranch = payload?.branch || (await gitEngine.getBranches()).current;
+          await gitEngine.push(payload?.remote, currentBranch);
           result = { success: true };
           break;
-        case 'pull':
-          await gitEngine.pull(payload?.remote, payload?.branch);
+        }
+        case 'pull': {
+          const currentBranch = payload?.branch || (await gitEngine.getBranches()).current;
+          await gitEngine.pull(payload?.remote, currentBranch);
           result = await gitEngine.getStatus();
           break;
+        }
         case 'checkout':
           await gitEngine.checkout(payload.branch);
           result = await gitEngine.getStatus();
