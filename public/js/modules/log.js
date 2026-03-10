@@ -107,16 +107,25 @@ export function computeGraphLayout(log) {
     if (commit.parents && commit.parents.length > 0) {
       commit.parents.forEach((parentHash, pIdx) => {
         if (pIdx === 0) {
-          // First parent: continue on same track
-          activeTracks[track] = parentHash;
+          // First parent: continue on same track, unless parent is already claimed
+          let targetTrack = track;
+          const existingTrack = activeTracks.indexOf(parentHash);
+          if (existingTrack !== -1) {
+            // Parent is already owned by another track, so this branch merges in
+            targetTrack = existingTrack;
+            activeTracks[track] = parentHash;
+          } else {
+            // Continue on same track
+            activeTracks[track] = parentHash;
+          }
 
           const pLogIdx = hashIndex.get(parentHash);
           edges.push({
             fromIdx: i,
             toIdx: pLogIdx !== undefined ? pLogIdx : -1,
             fromTrack: track,
-            toTrack: track,
-            color,
+            toTrack: targetTrack,
+            color: color,
             isMerge: false,
             isUnpushed: !pushedHashes.has(commit.hash)
           });
@@ -140,7 +149,7 @@ export function computeGraphLayout(log) {
             toIdx: pLogIdx !== undefined ? pLogIdx : -1,
             fromTrack: track,
             toTrack: mergeTrack,
-            color: mergeColor,
+            color: mergeColor, // The branch originating the merge colors the merge line
             isMerge: true,
             isUnpushed: !pushedHashes.has(commit.hash)
           });
@@ -359,22 +368,30 @@ function drawCommitGraph() {
       ctx.moveTo(fromX, fromY);
       ctx.lineTo(toX, toY);
     } else {
-      // Go straight down the side track to the parent commit
       const curveHeight = 30;
-      const straightTopY = Math.min(toY, fromY + curveHeight);
-      
-      // Start at the merge commit (main branch)
-      ctx.moveTo(fromX, fromY);
-      
-      // Curve out to the side track over 30px
-      ctx.bezierCurveTo(
-        fromX, straightTopY - (curveHeight / 2),
-        toX, straightTopY - (curveHeight / 2),
-        toX, straightTopY
-      );
-      
-      // Continue straight down the side track to the parent commit
-      ctx.lineTo(toX, toY);
+      if (edge.isMerge) {
+        // Splitting TO a side track (Merge commit -> second parent)
+        // Curve immediately at the child, then go straight down the side track
+        const straightTopY = Math.min(toY, fromY + curveHeight);
+        ctx.moveTo(fromX, fromY);
+        ctx.bezierCurveTo(
+          fromX, straightTopY - (curveHeight / 2),
+          toX, straightTopY - (curveHeight / 2),
+          toX, straightTopY
+        );
+        ctx.lineTo(toX, toY);
+      } else {
+        // Merging FROM a side track (Side track continuing into parent main track)
+        // Go straight down the side track, then curve into the parent at the bottom
+        const straightBottomY = Math.max(fromY, toY - curveHeight);
+        ctx.moveTo(fromX, fromY);
+        ctx.lineTo(fromX, straightBottomY);
+        ctx.bezierCurveTo(
+          fromX, straightBottomY + (curveHeight / 2),
+          toX, straightBottomY + (curveHeight / 2),
+          toX, toY
+        );
+      }
     }
     ctx.stroke();
     ctx.setLineDash([]);
