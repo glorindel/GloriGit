@@ -67,4 +67,4 @@ GloriGit/
 
 ## License
 
-MIT
+GNU GENERAL PUBLIC LICENSE v3.0
