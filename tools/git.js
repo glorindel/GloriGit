@@ -115,12 +115,11 @@ async function getStatus() {
  * Get commit log (paginated)
  */
 async function getLog(count = 50, skip = 0) {
-  const format = '--format={"hash":"%H","shortHash":"%h","author":"%an","email":"%ae","date":"%aI","message":"%s","refs":"%D"}';
+  const format = '--format={"hash":"%H","shortHash":"%h","author":"%an","email":"%ae","date":"%aI","message":"%s","refs":"%D","parents":"%P"}';
   const output = await git([
     'log', format,
     `--max-count=${count}`,
-    `--skip=${skip}`,
-    '--no-merges'
+    `--skip=${skip}`
   ]);
 
   const lines = output.trim().split('\n').filter(Boolean);
@@ -139,6 +138,7 @@ async function getLog(count = 50, skip = 0) {
     try {
       const entry = JSON.parse(line);
       entry.refs = entry.refs ? entry.refs.split(', ').filter(Boolean) : [];
+      entry.parents = entry.parents ? entry.parents.split(' ').filter(Boolean) : [];
       return entry;
     } catch {
       // Fallback for messages with special chars
@@ -150,6 +150,7 @@ async function getLog(count = 50, skip = 0) {
         const dateMatch = line.match(/"date":"([^"]+)"/);
         const refsMatch = line.match(/"refs":"([^"]*)"/);
         const messageMatch = line.match(/"message":"(.+?)","refs"/);
+        const parentsMatch = line.match(/"parents":"([^"]*)"/);
 
         return {
           hash: hashMatch ? hashMatch[1] : '',
@@ -158,16 +159,101 @@ async function getLog(count = 50, skip = 0) {
           email: emailMatch ? emailMatch[1] : '',
           date: dateMatch ? dateMatch[1] : '',
           message: messageMatch ? messageMatch[1] : '(parse error)',
-          refs: refsMatch && refsMatch[1] ? refsMatch[1].split(', ').filter(Boolean) : []
+          refs: refsMatch && refsMatch[1] ? refsMatch[1].split(', ').filter(Boolean) : [],
+          parents: parentsMatch && parentsMatch[1] ? parentsMatch[1].split(' ').filter(Boolean) : []
         };
       } catch {
         return {
           hash: '', shortHash: '', author: '', email: '',
-          date: '', message: '(parse error)', refs: []
+          date: '', message: '(parse error)', refs: [], parents: []
         };
       }
     }
   });
+}
+
+/**
+ * Get commit log for a specific file (Timemachine)
+ */
+async function getFileHistory(file, count = 50, skip = 0) {
+  const format = '--format={"hash":"%H","shortHash":"%h","author":"%an","email":"%ae","date":"%aI","message":"%s","refs":"%D","parents":"%P"}';
+  const output = await git([
+    'log', '--follow', format,
+    `--max-count=${count}`,
+    `--skip=${skip}`,
+    '--', file
+  ]);
+
+  const lines = output.trim().split('\n').filter(Boolean);
+  return lines.map(line => {
+    // Escape problematic characters in JSON
+    const sanitized = line
+      .replace(/\\/g, '\\\\')
+      .replace(/"/g, '\\"')
+      .replace(/\\"{/g, '{"')
+      .replace(/}\\"/g, '"}')
+      .replace(/\\":/g, '":')
+      .replace(/,\\"/g, ',"')
+      .replace(/:\\"([^"]*)\\"/g, ':"$1"');
+
+    try {
+      const entry = JSON.parse(line);
+      entry.refs = entry.refs ? entry.refs.split(', ').filter(Boolean) : [];
+      entry.parents = entry.parents ? entry.parents.split(' ').filter(Boolean) : [];
+      return entry;
+    } catch {
+      try {
+        const hashMatch = line.match(/"hash":"([^"]+)"/);
+        const shortMatch = line.match(/"shortHash":"([^"]+)"/);
+        const authorMatch = line.match(/"author":"([^"]+)"/);
+        const dateMatch = line.match(/"date":"([^"]+)"/);
+        const messageMatch = line.match(/"message":"(.+?)","refs"/);
+
+        return {
+          hash: hashMatch ? hashMatch[1] : '',
+          shortHash: shortMatch ? shortMatch[1] : '',
+          author: authorMatch ? authorMatch[1] : '',
+          date: dateMatch ? dateMatch[1] : '',
+          message: messageMatch ? messageMatch[1] : '(parse error)',
+          refs: [],
+          parents: []
+        };
+      } catch {
+        return {
+          hash: '', shortHash: '', author: '', date: '', message: '(parse error)', refs: [], parents: []
+        };
+      }
+    }
+  });
+}
+
+/**
+ * Get author commit stats for heatmap (last N days)
+ */
+async function getAuthorStats(days = 90) {
+  try {
+    const output = await git(['log', `--since="${days} days ago"`, '--format=%aI|%an']);
+    const stats = {};
+    const lines = output.trim().split('\n').filter(Boolean);
+    
+    lines.forEach(line => {
+      const parts = line.split('|');
+      if (parts.length < 2) return;
+      
+      const dateStr = parts[0];
+      const author = parts[1];
+      
+      const date = dateStr.split('T')[0];
+      
+      if (!stats[date]) stats[date] = {};
+      if (!stats[date][author]) stats[date][author] = 0;
+      stats[date][author]++;
+    });
+    
+    return stats;
+  } catch (err) {
+    return {};
+  }
 }
 
 /**
@@ -494,5 +580,7 @@ module.exports = {
   getRepoName,
   isGitRepo,
   getCommitFiles,
-  getCommitFileDiff
+  getCommitFileDiff,
+  getFileHistory,
+  getAuthorStats
 };

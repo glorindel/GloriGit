@@ -234,6 +234,12 @@ wss.on('connection', (ws) => {
         case 'commit-diff-file':
           result = await gitEngine.getCommitFileDiff(payload.hash, payload.file);
           break;
+        case 'file-history':
+          result = await gitEngine.getFileHistory(payload.file);
+          break;
+        case 'author-stats':
+          result = await gitEngine.getAuthorStats(payload.days || 90);
+          break;
 
         default:
           ws.send(JSON.stringify({ id, error: `Unknown action: ${action}` }));

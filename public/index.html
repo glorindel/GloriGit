@@ -59,6 +59,12 @@
         </svg>
         <span>Pull</span>
       </button>
+      <button class="header-action" id="heatmapBtn" title="Author Impact">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M2 12h2v2H2v-2zm3-4h2v6H5V8zm3-3h2v9H8V5zm3-4h2v13h-2V1z"/>
+        </svg>
+        <span>Heatmap</span>
+      </button>
       <button class="header-action push" id="pushBtn" title="Push">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
           <path d="M8.5 14V4.207l3.146 3.147.708-.708L8 2.293 3.646 6.646l.708.708L7.5 4.207V14h1Z"/>
@@ -154,6 +160,35 @@
           <ul class="file-list" id="inspectCommitFiles" style="flex: 1; overflow-y: auto;"></ul>
         </div>
       </div> <!-- /commitView -->
+
+      <!-- File History View (Hidden by Default) -->
+      <div id="fileHistoryView" style="display: none; flex-direction: column; flex: 1; overflow: hidden;">
+        <div class="commit-view-header">
+          <button class="back-btn" id="fhBackBtn">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M6.28 3.22a.75.75 0 0 0-1.06 0L1.47 6.97a.75.75 0 0 0 0 1.06l3.75 3.75a.75.75 0 0 0 1.06-1.06L3.56 8h10.69a.75.75 0 0 0 0-1.5H3.56l2.72-2.72a.75.75 0 0 0 0-1.06Z"/>
+            </svg>
+            Back to Workspace
+          </button>
+        </div>
+        <div class="commit-info">
+          <div class="commit-info-header" style="margin-bottom: 4px;">
+            <span class="commit-info-hash" style="color: var(--text-primary);">History for:</span>
+          </div>
+          <div class="commit-info-message" id="fhFilename" style="color: var(--accent-text); font-family: 'JetBrains Mono', monospace; overflow-wrap: anywhere;"></div>
+        </div>
+        <div class="panel-section" style="flex: 1; display: flex; flex-direction: column; overflow: hidden; border-bottom: none;">
+          <div class="section-header">
+            <h3>
+              <span class="section-icon">⏳</span>
+              Commits
+              <span class="count-badge" id="fhCount">0</span>
+            </h3>
+          </div>
+          <!-- We reuse the log-entries style for the history timeline -->
+          <div class="log-entries" id="fhEntries" style="flex: 1; max-height: none; padding-top: 8px;"></div>
+        </div>
+      </div> <!-- /fileHistoryView -->
       
     </aside>
 
@@ -199,7 +234,10 @@
           <path d="M2 6.5L5 3.5L8 6.5" stroke="currentColor" stroke-width="1.5" fill="none"/>
         </svg>
       </div>
-      <div class="log-entries" id="logEntries"></div>
+      <div class="log-entries" id="logEntries">
+        <canvas id="commitGraph" class="commit-graph"></canvas>
+        <div id="logEntriesContent"></div>
+      </div>
     </div>
   </footer>
 
@@ -239,10 +277,24 @@
     </div>
   </div>
 
-  <!-- Connection status -->
   <div class="connection-status" id="connectionStatus">
     <span class="connection-dot"></span>
     <span>Disconnected</span>
+  </div>
+
+  <!-- Heatmap Modal -->
+  <div class="modal-overlay" id="heatmapModalOverlay">
+    <div class="modal" id="heatmapModal" style="width: 800px; max-width: 90vw;">
+      <div class="modal-header">
+        Author Impact Heatmap (Last 90 Days)
+        <button class="help-close-btn" id="heatmapModalClose" style="float: right;">×</button>
+      </div>
+      <div class="modal-body" style="background: var(--bg-base); border-radius: var(--radius-sm); padding: 16px;">
+        <div id="heatmapContainer" style="overflow-x: auto; min-height: 120px; display: flex; flex-direction: column; gap: 16px;">
+          <div style="color: var(--text-muted); text-align: center;">Loading stats...</div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script src="/js/app.js"></script>

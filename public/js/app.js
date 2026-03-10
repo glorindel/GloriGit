@@ -74,6 +74,7 @@
     logBar: $('logBar'),
     logToggle: $('logToggle'),
     logEntries: $('logEntries'),
+    logEntriesContent: $('logEntriesContent'),
 
     // UI
     toastContainer: $('toastContainer'),
@@ -98,6 +99,22 @@
     inspectCommitMessage: $('inspectCommitMessage'),
     inspectCommitFileCount: $('inspectCommitFileCount'),
     inspectCommitFiles: $('inspectCommitFiles'),
+
+    // File History Timemachine
+    fileHistoryView: $('fileHistoryView'),
+    fhBackBtn: $('fhBackBtn'),
+    fhFilename: $('fhFilename'),
+    fhCount: $('fhCount'),
+    fhEntries: $('fhEntries'),
+
+    // Canvas Graph
+    commitGraph: $('commitGraph'),
+
+    // Heatmap Modal
+    heatmapBtn: $('heatmapBtn'),
+    heatmapModalOverlay: $('heatmapModalOverlay'),
+    heatmapModalClose: $('heatmapModalClose'),
+    heatmapContainer: $('heatmapContainer')
   };
 
   // =========================================
@@ -256,13 +273,20 @@
       li.innerHTML = `
         <span class="file-status ${item.status}">${item.status}</span>
         <span class="file-name">${parts.dir ? `<span class="file-dir">${parts.dir}/</span>` : ''}${parts.name}</span>
+        <button class="file-history-btn" title="View History">⏳</button>
         <button class="file-action" title="${type === 'staged' ? 'Unstage' : 'Stage'}">${type === 'staged' ? '−' : '+'}</button>
       `;
 
       // Click file to show diff
       li.addEventListener('click', (e) => {
-        if (e.target.classList.contains('file-action')) return;
+        if (e.target.classList.contains('file-action') || e.target.classList.contains('file-history-btn')) return;
         selectFile(item.file, type);
+      });
+
+      // History button
+      li.querySelector('.file-history-btn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        openFileHistoryView(item.file);
       });
 
       // Stage/Unstage button
@@ -294,6 +318,7 @@
       li.innerHTML = `
         <span class="file-status U">?</span>
         <span class="file-name">${parts.dir ? `<span class="file-dir">${parts.dir}/</span>` : ''}${parts.name}</span>
+        <button class="file-history-btn" title="View History" style="opacity:0.3; cursor:not-allowed">⏳</button>
         <button class="file-action" title="Stage">+</button>
       `;
 
@@ -492,7 +517,7 @@
   // =========================================
   function renderLog(log) {
     state.log = log;
-    dom.logEntries.innerHTML = '';
+    dom.logEntriesContent.innerHTML = '';
 
     log.forEach(entry => {
       const div = document.createElement('div');
@@ -516,7 +541,180 @@
       div.style.cursor = 'pointer';
       div.addEventListener('click', () => openCommitView(entry));
 
-      dom.logEntries.appendChild(div);
+      dom.logEntriesContent.appendChild(div);
+    });
+
+    // Draw the visual graph after DOM elements are created
+    requestAnimationFrame(() => drawCommitGraph(log));
+  }
+
+  function drawCommitGraph(log) {
+    if (!dom.commitGraph || log.length === 0) return;
+    
+    const canvas = dom.commitGraph;
+    const ctx = canvas.getContext('2d');
+    const entries = dom.logEntries.querySelectorAll('.log-entry');
+    
+    // Set exact dimensions
+    canvas.width = 60;
+    canvas.height = dom.logEntries.scrollHeight;
+    
+    // Clear
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Aesthetics - Cyberpunk Neon Palette
+    const colors = ['#22d3ee', '#f472b6', '#a855f7', '#fbbf24', '#4ade80', '#f87171'];
+    
+    // Nodes position helpers
+    const getX = (track) => 20 + (track * 12);
+    const getY = (index) => {
+      const el = entries[index];
+      return el ? el.offsetTop + (el.offsetHeight / 2) : 0;
+    };
+    
+    // Routing state
+    let activeTracks = []; // Array of active parent hashes
+    const trackColors = {}; // Track index -> color
+    let nextColorIdx = 0;
+    
+    // Pass 1: Assign commits to tracks and build connections
+    const nodes = []; // store node data for drawing later
+    const edges = []; // store edge data
+    
+    log.forEach((commit, i) => {
+      let currentTrack = activeTracks.indexOf(commit.hash);
+      
+      if (currentTrack === -1) {
+        // Find empty slot or append
+        currentTrack = activeTracks.findIndex(t => !t);
+        if (currentTrack === -1) currentTrack = activeTracks.length;
+        
+        // Assign color
+        trackColors[currentTrack] = colors[nextColorIdx % colors.length];
+        nextColorIdx++;
+      }
+      
+      const commitColor = trackColors[currentTrack];
+      const y = getY(i);
+      const x = getX(currentTrack);
+      
+      nodes.push({ x, y, color: commitColor, isMerge: commit.parents && commit.parents.length > 1 });
+      
+      // Update tracks with parents
+      if (commit.parents && commit.parents.length > 0) {
+        commit.parents.forEach((parentHash, pIdx) => {
+          if (pIdx === 0) {
+            // First parent inherits the primary track
+            activeTracks[currentTrack] = parentHash;
+            
+            // Find parent index in log
+            const pLogIdx = log.findIndex(c => c.hash === parentHash);
+            if (pLogIdx !== -1) {
+               edges.push({
+                 fromX: x, fromY: y,
+                 toX: getX(currentTrack), toY: getY(pLogIdx),
+                 color: commitColor
+               });
+            } else {
+               // Parent is further back, just draw line downwards out of view
+               edges.push({
+                 fromX: x, fromY: y,
+                 toX: getX(currentTrack), toY: canvas.height + 20,
+                 color: commitColor
+               });
+            }
+          } else {
+            // Additional parents (Merge)
+            let mergeTrack = activeTracks.indexOf(parentHash);
+            
+            // If parent isn't in a track yet, find an empty one for it
+            if (mergeTrack === -1) {
+              mergeTrack = activeTracks.findIndex(t => !t && t !== currentTrack);
+              if (mergeTrack === -1) mergeTrack = activeTracks.length;
+              activeTracks[mergeTrack] = parentHash;
+              
+              if (!trackColors[mergeTrack]) {
+                 trackColors[mergeTrack] = colors[nextColorIdx % colors.length];
+                 nextColorIdx++;
+              }
+            }
+            
+            const pLogIdx = log.findIndex(c => c.hash === parentHash);
+            const parentColor = trackColors[mergeTrack];
+            
+            if (pLogIdx !== -1) {
+               // Draw merge line
+               edges.push({
+                 fromX: x, fromY: y,
+                 toX: getX(mergeTrack), toY: getY(pLogIdx),
+                 color: parentColor
+               });
+            } else {
+               // Parent out of view downwards
+               edges.push({
+                 fromX: x, fromY: y,
+                 toX: getX(mergeTrack), toY: canvas.height + 20,
+                 color: parentColor
+               });
+            }
+          }
+        });
+      } else {
+        // Initial commit or no parents
+        activeTracks[currentTrack] = null; // Free up track
+      }
+    });
+    
+    // Draw all edges (bottom to top ideally, so nodes render on top)
+    ctx.lineWidth = 2;
+    ctx.lineCap = 'round';
+    
+    edges.forEach(edge => {
+      ctx.beginPath();
+      ctx.strokeStyle = edge.color;
+      
+      // If straightforward vertical
+      if (edge.fromX === edge.toX) {
+        ctx.moveTo(edge.fromX, edge.fromY);
+        ctx.lineTo(edge.toX, edge.toY);
+      } else {
+        // Curved merge/branch lines
+        ctx.moveTo(edge.fromX, edge.fromY);
+        // Add bezier curve
+        ctx.bezierCurveTo(
+          edge.fromX, edge.fromY + 15,
+          edge.toX, edge.toY - 15,
+          edge.toX, edge.toY
+        );
+      }
+      ctx.stroke();
+    });
+    
+    // Draw nodes
+    nodes.forEach(node => {
+      // Glow
+      ctx.shadowBlur = 6;
+      ctx.shadowColor = node.color;
+      
+      ctx.beginPath();
+      ctx.arc(node.x, node.y, 4, 0, Math.PI * 2);
+      ctx.fillStyle = '#0f172a'; // match bg-base
+      ctx.fill();
+      
+      ctx.lineWidth = 2.5;
+      ctx.strokeStyle = node.color;
+      ctx.stroke();
+      
+      if (node.isMerge) {
+         // Add a dot inside for merge commits
+         ctx.beginPath();
+         ctx.arc(node.x, node.y, 1.5, 0, Math.PI * 2);
+         ctx.fillStyle = node.color;
+         ctx.fill();
+      }
+      
+      // Reset shadow
+      ctx.shadowBlur = 0;
     });
   }
 
@@ -600,6 +798,169 @@
     if (state.selectedType === 'history') {
       clearDiff();
     }
+  }
+
+  // =========================================
+  //  FILE HISTORY TIMEMACHINE
+  // =========================================
+  async function openFileHistoryView(file) {
+    state.inspectingCommit = file; // Reuse state mechanic
+    
+    dom.workspaceView.style.display = 'none';
+    dom.commitView.style.display = 'none';
+    dom.fileHistoryView.style.display = 'flex';
+    
+    dom.fhFilename.textContent = file;
+    dom.fhCount.textContent = '...';
+    dom.fhEntries.innerHTML = '<div style="padding: 10px; color: var(--text-muted);">Loading timeline...</div>';
+    
+    clearDiff();
+    
+    try {
+      const history = await send('file-history', { file });
+      dom.fhCount.textContent = history.length;
+      renderFileHistory(history, file);
+    } catch (err) {
+      dom.fhEntries.innerHTML = `<div style="padding: 10px; color: var(--red);">Error: ${escapeHtml(err.error || err.message)}</div>`;
+    }
+  }
+
+  function renderFileHistory(history, file) {
+    dom.fhEntries.innerHTML = '';
+    
+    history.forEach((entry, idx) => {
+      const div = document.createElement('div');
+      div.className = 'log-entry';
+      div.style.cursor = 'pointer';
+      
+      const timeAgo = getTimeAgo(entry.date);
+      
+      div.innerHTML = `
+        <span class="log-hash">${escapeHtml(entry.shortHash)}</span>
+        <span class="log-message">${escapeHtml(entry.message)}</span>
+        <span class="log-date">${timeAgo}</span>
+      `;
+      
+      div.addEventListener('click', async () => {
+        document.querySelectorAll('#fhEntries .log-entry').forEach(el => el.classList.remove('selected', 'active'));
+        div.style.background = 'var(--bg-active)';
+        
+        state.selectedFile = file;
+        state.selectedType = 'history';
+
+        dom.diffFilename.textContent = `${file} (at ${entry.shortHash})`;
+        dom.diffActions.style.display = 'none';
+        dom.diffContent.innerHTML = '<div class="diff-empty"><p style="color:var(--text-muted)">Loading historical diff...</p></div>';
+
+        try {
+          const diffData = await send('commit-diff-file', { hash: entry.hash, file });
+          renderDiff(diffData);
+        } catch (err) {
+          toast('Failed to load historical diff', 'error');
+          dom.diffContent.innerHTML = `<div class="diff-empty"><p style="color:var(--red)">Failed to load</p></div>`;
+        }
+      });
+      
+      // Auto-load the newest history entry diff
+      if (idx === 0) {
+        div.click();
+      }
+      
+      dom.fhEntries.appendChild(div);
+    });
+  }
+
+  function closeFileHistoryView() {
+    state.inspectingCommit = null;
+    dom.fileHistoryView.style.display = 'none';
+    dom.workspaceView.style.display = 'flex';
+    if (state.selectedType === 'history') {
+      clearDiff();
+    }
+  }
+
+  // =========================================
+  //  AUTHOR IMPACT HEATMAP
+  // =========================================
+  async function loadHeatmap() {
+    dom.heatmapModalOverlay.classList.add('active');
+    dom.heatmapContainer.innerHTML = '<div style="color: var(--text-muted); text-align: center;">Loading stats...</div>';
+    
+    try {
+      const stats = await send('author-stats', { days: 90 });
+      renderHeatmap(stats);
+    } catch (err) {
+      dom.heatmapContainer.innerHTML = `<div style="color: var(--red);">Failed to load heatmap: ${err.message}</div>`;
+    }
+  }
+
+  function renderHeatmap(stats) {
+    dom.heatmapContainer.innerHTML = '';
+    
+    // Format: stats = { '2024-03-01': { 'Author': 5 } }
+    // Let's aggregate by author first
+    const authors = {};
+    const dates = Object.keys(stats).sort();
+    
+    if (dates.length === 0) {
+      dom.heatmapContainer.innerHTML = '<div style="color: var(--text-muted); text-align: center;">No activity in the last 90 days.</div>';
+      return;
+    }
+    
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - 90);
+    
+    // Group stats by author
+    Object.entries(stats).forEach(([dateStr, dateStats]) => {
+      Object.entries(dateStats).forEach(([author, count]) => {
+        if (!authors[author]) authors[author] = { total: 0, days: {} };
+        authors[author].days[dateStr] = count;
+        authors[author].total += count;
+      });
+    });
+    
+    // Sort authors by total commits descending
+    const sortedAuthors = Object.entries(authors).sort((a, b) => b[1].total - a[1].total);
+    
+    sortedAuthors.forEach(([author, data]) => {
+      const authorBlock = document.createElement('div');
+      authorBlock.innerHTML = `
+        <div class="heatmap-author-label">
+          <span>${escapeHtml(author)}</span>
+          <span class="heatmap-total-badge">${data.total} commits</span>
+        </div>
+        <div class="heatmap-scroll-container">
+          <div class="heatmap-grid" id="grid-${author.replace(/[^a-z0-9]/gi, '')}"></div>
+        </div>
+      `;
+      dom.heatmapContainer.appendChild(authorBlock);
+      
+      const grid = authorBlock.querySelector('.heatmap-grid');
+      
+      // Calculate start of the grid (Sunday prior to 90 days ago)
+      let current = new Date(startDate);
+      current.setDate(current.getDate() - current.getDay()); 
+      
+      const today = new Date();
+      
+      while (current <= today) {
+        const dateStr = current.toISOString().split('T')[0];
+        const count = data.days[dateStr] || 0;
+        
+        let level = 0;
+        if (count > 0) level = 1;
+        if (count >= 5) level = 2;
+        if (count >= 10) level = 3;
+        if (count >= 20) level = 4;
+        
+        const cell = document.createElement('div');
+        cell.className = `heatmap-cell ${level ? 'level-' + level : ''}`;
+        cell.title = `${count} commits on ${dateStr}`;
+        grid.appendChild(cell);
+        
+        current.setDate(current.getDate() + 1);
+      }
+    });
   }
 
   function getTimeAgo(dateStr) {
@@ -719,6 +1080,7 @@
   function bindEvents() {
     // Commit View Back Button
     dom.backToWorkspaceBtn.addEventListener('click', closeCommitView);
+    dom.fhBackBtn.addEventListener('click', closeFileHistoryView);
 
     // Branch dropdown
     dom.branchBtn.addEventListener('click', toggleBranchDropdown);
@@ -865,6 +1227,13 @@
       if (e.target === dom.helpModalOverlay) dom.helpModalOverlay.classList.remove('active');
     });
 
+    // Heatmap
+    dom.heatmapBtn.addEventListener('click', loadHeatmap);
+    dom.heatmapModalClose.addEventListener('click', () => dom.heatmapModalOverlay.classList.remove('active'));
+    dom.heatmapModalOverlay.addEventListener('click', (e) => {
+      if (e.target === dom.heatmapModalOverlay) dom.heatmapModalOverlay.classList.remove('active');
+    });
+
     // Keyboard shortcuts
     document.addEventListener('keydown', (e) => {
       // Ctrl+Enter = Commit
@@ -877,8 +1246,10 @@
         hideModal();
         closeBranchDropdown();
         dom.helpModalOverlay.classList.remove('active');
+        dom.heatmapModalOverlay.classList.remove('active');
         if (state.inspectingCommit) {
           closeCommitView();
+          closeFileHistoryView();
         }
       }
 
