@@ -82,6 +82,9 @@
     modalBody: $('modalBody'),
     modalCancel: $('modalCancel'),
     modalConfirm: $('modalConfirm'),
+    helpBtn: $('helpBtn'),
+    helpModalOverlay: $('helpModalOverlay'),
+    helpModalClose: $('helpModalClose'),
     connectionStatus: $('connectionStatus')
   };
 
@@ -756,6 +759,17 @@
       if (e.target === dom.modalOverlay) hideModal();
     });
 
+    // Help Modal
+    dom.helpBtn.addEventListener('click', () => {
+      dom.helpModalOverlay.classList.add('active');
+    });
+    dom.helpModalClose.addEventListener('click', () => {
+      dom.helpModalOverlay.classList.remove('active');
+    });
+    dom.helpModalOverlay.addEventListener('click', (e) => {
+      if (e.target === dom.helpModalOverlay) dom.helpModalOverlay.classList.remove('active');
+    });
+
     // Keyboard shortcuts
     document.addEventListener('keydown', (e) => {
       // Ctrl+Enter = Commit
@@ -767,6 +781,13 @@
       if (e.key === 'Escape') {
         hideModal();
         closeBranchDropdown();
+        dom.helpModalOverlay.classList.remove('active');
+      }
+
+      // ? = Toggle help
+      if (e.key === '?' && document.activeElement.tagName !== 'INPUT') {
+        e.preventDefault();
+        dom.helpModalOverlay.classList.toggle('active');
       }
 
       // Ctrl+Shift+P = Push

@@ -66,6 +66,13 @@
         </svg>
         <span>Push</span>
       </button>
+      <button class="header-action" id="helpBtn" title="Keyboard Shortcuts (?)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+      </button>
       <button class="header-action" id="refreshBtn" title="Refresh">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
           <path d="M13.65 2.35a8 8 0 1 0 1.77 5.15h-2.02a6 6 0 1 1-1.27-3.63L10 6h6V0l-2.35 2.35Z"/>
@@ -172,6 +179,27 @@
       <div class="modal-actions">
         <button class="modal-btn cancel" id="modalCancel">Cancel</button>
         <button class="modal-btn confirm" id="modalConfirm">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Help Modal -->
+  <div class="modal-overlay" id="helpModalOverlay">
+    <div class="modal" id="helpModal" style="width: 450px;">
+      <div class="modal-header">Keyboard Shortcuts</div>
+      <div class="modal-body">
+        <table style="width: 100%; border-collapse: collapse; text-align: left; font-family: 'JetBrains Mono', monospace;">
+          <tr style="border-bottom: 1px solid var(--border-subtle);"><th style="padding: 8px 0; color: var(--text-primary);">Shortcut</th><th style="padding: 8px 0; color: var(--text-primary);">Action</th></tr>
+          <tr style="border-bottom: 1px solid var(--border-subtle);"><td style="padding: 8px 0; color: var(--accent-text);">Ctrl + Enter</td><td style="padding: 8px 0;">Commit staged changes</td></tr>
+          <tr style="border-bottom: 1px solid var(--border-subtle);"><td style="padding: 8px 0; color: var(--accent-text);">Ctrl + Shift + P</td><td style="padding: 8px 0;">Push to remote origin</td></tr>
+          <tr style="border-bottom: 1px solid var(--border-subtle);"><td style="padding: 8px 0; color: var(--accent-text);">Ctrl + Shift + L</td><td style="padding: 8px 0;">Pull from remote origin</td></tr>
+          <tr style="border-bottom: 1px solid var(--border-subtle);"><td style="padding: 8px 0; color: var(--accent-text);">Ctrl + R</td><td style="padding: 8px 0;">Refresh repository status</td></tr>
+          <tr style="border-bottom: 1px solid var(--border-subtle);"><td style="padding: 8px 0; color: var(--accent-text);">?</td><td style="padding: 8px 0;">Toggle this help menu</td></tr>
+          <tr><td style="padding: 8px 0; color: var(--accent-text);">Escape</td><td style="padding: 8px 0;">Close modals / dropdowns</td></tr>
+        </table>
+      </div>
+      <div class="modal-actions">
+        <button class="modal-btn cancel" id="helpModalClose">Close</button>
       </div>
     </div>
   </div>
