@@ -878,11 +878,14 @@
         doCommit();
       }
 
-      // Escape = close modals/dropdowns
+      // Escape = close modals/dropdowns/commit view
       if (e.key === 'Escape') {
         hideModal();
         closeBranchDropdown();
         dom.helpModalOverlay.classList.remove('active');
+        if (state.inspectingCommit) {
+          closeCommitView();
+        }
       }
 
       // ? = Toggle help
