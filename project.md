@@ -72,3 +72,21 @@
 - Server startup < 500ms
 - UI response to user action < 100ms
 - No data leaves localhost
+
+## Modular Architecture
+
+The frontend is organized into ES modules (native `import`/`export`, no bundler):
+
+```
+public/
+├── css/           # 10 focused stylesheets (base, header, sidebar, diff, footer, ...)
+├── js/
+│   ├── app.js     # Entry point — imports, event binding, init
+│   ├── core/      # state.js, dom.js, ws.js, utils.js
+│   ├── ui/        # toast.js, modal.js, connection.js
+│   └── modules/   # status.js, diff.js, branches.js, log.js, commit.js,
+│                  # historian.js, timemachine.js, heatmap.js
+└── index.html     # <script type="module" src="/js/app.js">
+```
+
+See **[FEATURE_MAP.md](FEATURE_MAP.md)** for a complete table mapping every feature to its exact JS module, CSS file, and HTML section.
