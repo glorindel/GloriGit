@@ -279,25 +279,31 @@ function drawCommitGraph() {
   // Guard: don't draw if entries aren't laid out (panel collapsed)
   if (entries.length === 0 || entries[0].offsetHeight === 0) return;
 
-  const scrollContainer = dom.logEntries;
-  const containerRect = scrollContainer.getBoundingClientRect();
-  const scrollTop = scrollContainer.scrollTop;
-
-  canvas.width = graphWidth;
-  canvas.height = scrollContainer.scrollHeight;
-
-  // Update left padding on entries to match graph width
+  // 1) Update padding FIRST so layout stabilizes
   entries.forEach(el => {
     el.style.paddingLeft = `${graphWidth + 8}px`;
   });
+  // Also update the canvas CSS width to match
+  canvas.style.width = `${graphWidth}px`;
+
+  // 2) Force reflow so getBoundingClientRect reflects padding
+  void dom.logEntries.offsetHeight;
+
+  // 3) Now set canvas dimensions (this clears the context)
+  const scrollContainer = dom.logEntries;
+  canvas.width = graphWidth;
+  canvas.height = scrollContainer.scrollHeight;
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // 4) Compute positions AFTER layout is stable
+  const containerRect = scrollContainer.getBoundingClientRect();
+  const scrollTop = scrollContainer.scrollTop;
 
   const getX = (track) => trackPadding + (track * trackSpacing);
   const getY = (index) => {
     const el = entries[index];
     if (!el) return 0;
-    // Calculate position relative to the scroll container's top (accounting for scroll)
     const rect = el.getBoundingClientRect();
     return rect.top - containerRect.top + scrollTop + (rect.height / 2);
   };
