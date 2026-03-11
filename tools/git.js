@@ -613,7 +613,26 @@ async function getStashes() {
         }
         return entry;
       } catch {
-        return null;
+        try {
+          const indexMatch = line.match(/"index":"([^"]+)"/);
+          const hashMatch = line.match(/"hash":"([^"]+)"/);
+          const shortMatch = line.match(/"shortHash":"([^"]+)"/);
+          const dateMatch = line.match(/"date":"([^"]+)"/);
+          const messageMatch = line.match(/"message":"(.+?)"}$/);
+
+          const entry = {
+            index: indexMatch ? indexMatch[1] : '',
+            hash: hashMatch ? hashMatch[1] : '',
+            shortHash: shortMatch ? shortMatch[1] : '',
+            date: dateMatch ? dateMatch[1] : '',
+            message: messageMatch ? messageMatch[1] : '(parse error)'
+          };
+          const idMatch = entry.index.match(/stash@{(\d+)}/);
+          entry.id = idMatch ? parseInt(idMatch[1], 10) : -1;
+          return entry;
+        } catch {
+          return null;
+        }
       }
     }).filter(Boolean);
   } catch (err) {

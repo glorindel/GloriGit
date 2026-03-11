@@ -36,13 +36,13 @@ export function renderStashes(stashes) {
   // Attach events
   list.querySelectorAll('.stash-apply').forEach(btn => {
     btn.onclick = () => {
-      send('stash-apply', { index: btn.dataset.index });
+      send('stash-apply', { index: btn.dataset.index }).then(() => send('status'));
     };
   });
 
   list.querySelectorAll('.stash-pop').forEach(btn => {
     btn.onclick = () => {
-      send('stash-pop', { index: btn.dataset.index });
+      send('stash-pop', { index: btn.dataset.index }).then(() => send('status'));
     };
   });
 
