@@ -36,13 +36,19 @@ export function renderStashes(stashes) {
   // Attach events
   list.querySelectorAll('.stash-apply').forEach(btn => {
     btn.onclick = () => {
-      send('stash-apply', { index: btn.dataset.index }).then(() => send('status'));
+      send('stash-apply', { index: btn.dataset.index }).then(stashes => {
+        renderStashes(stashes);
+        send('status');
+      });
     };
   });
 
   list.querySelectorAll('.stash-pop').forEach(btn => {
     btn.onclick = () => {
-      send('stash-pop', { index: btn.dataset.index }).then(() => send('status'));
+      send('stash-pop', { index: btn.dataset.index }).then(stashes => {
+        renderStashes(stashes);
+        send('status');
+      });
     };
   });
 
@@ -51,7 +57,9 @@ export function renderStashes(stashes) {
       showModal('Drop Stash', 
         `Are you sure you want to drop stash@{${btn.dataset.index}}? This cannot be undone.`,
         () => {
-          send('stash-drop', { index: btn.dataset.index });
+          send('stash-drop', { index: btn.dataset.index }).then(stashes => {
+            renderStashes(stashes);
+          });
         }
       );
     };
@@ -61,7 +69,10 @@ export function renderStashes(stashes) {
 // Wire up saving stashes
 dom.stashSaveBtn.addEventListener('click', () => {
   const msg = dom.stashMessageInput.value.trim();
-  send('stash-save', { message: msg });
+  send('stash-save', { message: msg }).then(stashes => {
+    renderStashes(stashes);
+    send('status'); 
+  });
   dom.stashMessageInput.value = '';
 });
 
