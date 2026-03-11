@@ -119,7 +119,7 @@ function bindEvents() {
 
   // Discard all
   dom.discardAllBtn.addEventListener('click', () => {
-    if (!state.status?.modified.length) return;
+    if (!state.status?.unstaged?.length) return;
     showModal('Discard All Modified', 
       'Are you sure you want to discard all changes to tracked files? This cannot be undone.',
       async () => {
@@ -135,7 +135,7 @@ function bindEvents() {
   });
 
   dom.discardAllUntrackedBtn.addEventListener('click', () => {
-    if (!state.status?.untracked.length) return;
+    if (!state.status?.untracked?.length) return;
     showModal('Delete All Untracked', 
       'Are you sure you want to permanently delete all untracked files? This cannot be undone.',
       async () => {
