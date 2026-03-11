@@ -12,12 +12,22 @@
 
 ## Installation
 
-### For Users
-Install GloriGit globally to make the `glorigit` command available anywhere on your system:
+### For Users (Global)
+The most reliable way to install is to clone the repository first:
 
 ```bash
-npm install -g glorigit
+git clone https://github.com/glorindel/GloriGit.git
+cd GloriGit
+npm install -g .
 ```
+
+Alternatively, you can try installing directly via URL (though this can sometimes fail due to npm/git configurations):
+```bash
+npm install -g https://github.com/glorindel/GloriGit.git
+```
+
+> [!NOTE]
+> `npm install -g glorigit` will only work once the package is published to the public npm registry.
 
 ### For Developers (Local Development)
 If you've cloned the repository and want to run it globally while testing changes:
