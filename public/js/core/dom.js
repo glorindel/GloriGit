@@ -28,8 +28,10 @@ export const dom = {
   unstagedCount: $('unstagedCount'),
   untrackedCount: $('untrackedCount'),
   stageAllBtn: $('stageAllBtn'),
+  discardAllBtn: $('discardAllBtn'),
   unstageAllBtn: $('unstageAllBtn'),
   stageAllUntrackedBtn: $('stageAllUntrackedBtn'),
+  discardAllUntrackedBtn: $('discardAllUntrackedBtn'),
 
   // Diff panel
   diffFilename: $('diffFilename'),

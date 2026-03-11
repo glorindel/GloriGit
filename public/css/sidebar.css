@@ -72,6 +72,12 @@
   font-weight: 500;
 }
 
+.section-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
 .section-action {
   width: 22px;
   height: 22px;
@@ -92,6 +98,12 @@
   background: var(--bg-overlay);
   border-color: var(--border);
   color: var(--accent-text);
+}
+
+.section-action.btn-danger:hover {
+  color: var(--red);
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
 }
 
 /* File list */

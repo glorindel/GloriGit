@@ -283,6 +283,14 @@ wss.on('connection', (ws) => {
           await gitEngine.deleteUntrackedFile(payload.file);
           result = await gitEngine.getStatus();
           break;
+        case 'discard-all-modified':
+          await gitEngine.discardAllModified();
+          result = await gitEngine.getStatus();
+          break;
+        case 'discard-all-untracked':
+          await gitEngine.discardAllUntracked();
+          result = await gitEngine.getStatus();
+          break;
         case 'commit-files':
           result = await gitEngine.getCommitFiles(payload.hash);
           break;

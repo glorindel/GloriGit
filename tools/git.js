@@ -537,6 +537,20 @@ async function merge(branch) {
 }
 
 /**
+ * Discard all changes in tracked files
+ */
+async function discardAllModified() {
+  return await git(['checkout', '--', '.']);
+}
+
+/**
+ * Delete all untracked files
+ */
+async function discardAllUntracked() {
+  return await git(['clean', '-fd']);
+}
+
+/**
  * Discard changes to a tracked file (checkout from HEAD)
  */
 async function discardFile(file) {
@@ -762,8 +776,11 @@ module.exports = {
   merge,
   discardFile,
   deleteUntrackedFile,
+  discardAllModified,
+  discardAllUntracked,
   getRepoName,
   isGitRepo,
+  // Duplicates in original export list, keeping them as is
   getCommitFiles,
   getCommitFileDiff,
   getFileHistory,

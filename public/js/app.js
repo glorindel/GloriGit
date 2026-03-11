@@ -117,6 +117,39 @@ function bindEvents() {
     }
   });
 
+  // Discard all
+  dom.discardAllBtn.addEventListener('click', () => {
+    if (!state.status?.modified.length) return;
+    showModal('Discard All Modified', 
+      'Are you sure you want to discard all changes to tracked files? This cannot be undone.',
+      async () => {
+        try {
+          await send('discard-all-modified');
+          clearDiff();
+          toast('All modified files discarded', 'success');
+        } catch (err) {
+          toast(err.error || 'Failed to discard files', 'error');
+        }
+      }
+    );
+  });
+
+  dom.discardAllUntrackedBtn.addEventListener('click', () => {
+    if (!state.status?.untracked.length) return;
+    showModal('Delete All Untracked', 
+      'Are you sure you want to permanently delete all untracked files? This cannot be undone.',
+      async () => {
+        try {
+          await send('discard-all-untracked');
+          clearDiff();
+          toast('All untracked files deleted', 'success');
+        } catch (err) {
+          toast(err.error || 'Failed to delete files', 'error');
+        }
+      }
+    );
+  });
+
   // Diff actions
   dom.diffStageBtn.addEventListener('click', () => {
     if (!state.selectedFile) return;
