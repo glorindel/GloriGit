@@ -269,6 +269,12 @@ wss.on('connection', (ws) => {
           await gitEngine.stashDrop(payload.index);
           result = await gitEngine.getStashes();
           break;
+        case 'stash-files':
+          result = await gitEngine.getStashFiles(payload.index);
+          break;
+        case 'stash-diff':
+          result = await gitEngine.getStashDiff(payload.index, payload.file);
+          break;
         case 'discard':
           await gitEngine.discardFile(payload.file);
           result = await gitEngine.getStatus();

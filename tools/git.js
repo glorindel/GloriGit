@@ -641,6 +641,44 @@ async function getStashes() {
 }
 
 /**
+ * Get files in a stash
+ */
+async function getStashFiles(index) {
+  // `git stash show --name-status stash@{X}`
+  try {
+    const output = await git(['stash', 'show', '--name-status', `stash@{${index}}`]);
+    const files = [];
+    const lines = output.trim().split('\n').filter(Boolean);
+    for (const line of lines) {
+      if (line.includes('\t')) {
+        const [status, file] = line.split('\t');
+        files.push({ file, status: status[0] });
+      } else {
+        const parts = line.split(/\s+/);
+        if (parts.length >= 2) {
+          files.push({ file: parts.slice(1).join(' '), status: parts[0][0] });
+        }
+      }
+    }
+    return files;
+  } catch (err) {
+    return [];
+  }
+}
+
+/**
+ * Get diff for a file in a stash
+ */
+async function getStashDiff(index, file) {
+  try {
+    const output = await git(['diff', `stash@{${index}}^..stash@{${index}}`, '--', file]);
+    return parseDiff(output, file);
+  } catch (err) {
+    return { file, hunks: [] };
+  }
+}
+
+/**
  * Save stash
  */
 async function stashSave(message) {
@@ -689,6 +727,8 @@ module.exports = {
   push,
   pull,
   getStashes,
+  getStashFiles,
+  getStashDiff,
   stashSave,
   stashApply,
   stashPop,
