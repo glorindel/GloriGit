@@ -222,9 +222,16 @@
           <div class="storage-section-header">
             <span class="storage-section-title title-stash">◈ Stashes</span>
           </div>
-          <div class="stash-save-area">
-            <input type="text" id="stashMessageInput" class="stash-input" placeholder="Message to stash..." autocomplete="off">
-            <button class="storage-action-btn btn-stash" id="stashSaveBtn">Save</button>
+          <div class="stash-save-container">
+            <div class="stash-save-area">
+              <input type="text" id="stashMessageInput" class="stash-input" placeholder="Message to stash..." autocomplete="off">
+              <button class="storage-action-btn btn-stash" id="stashSaveBtn">Save</button>
+            </div>
+            <div class="stash-toggles-area">
+              <button class="stash-toggle active" id="stashToggleStaged" title="Include staged changes">Staged</button>
+              <button class="stash-toggle active" id="stashToggleUnstaged" title="Include unstaged changes">Unstaged</button>
+              <button class="stash-toggle" id="stashToggleUntracked" title="Include untracked files">Untracked</button>
+            </div>
           </div>
           <ul class="storage-list" id="stashesList" style="flex: 1; max-height: none;">
             <div class="storage-empty">No stashes found</div>

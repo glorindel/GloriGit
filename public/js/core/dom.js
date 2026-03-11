@@ -63,12 +63,15 @@ export const dom = {
   helpModalClose: $('helpModalClose'),
   
   // Storage View
-  storageBtn: $('storageBtn'),
+  stashBtn: $('storageBtn'),
   storageView: $('storageView'),
-  storageBackBtn: $('storageBackBtn'),
+  stashBackBtn: $('storageBackBtn'),
   stashesList: $('stashesList'),
   stashMessageInput: $('stashMessageInput'),
   stashSaveBtn: $('stashSaveBtn'),
+  stashToggleStaged: $('stashToggleStaged'),
+  stashToggleUnstaged: $('stashToggleUnstaged'),
+  stashToggleUntracked: $('stashToggleUntracked'),
   connectionStatus: $('connectionStatus'),
 
   // Workspace vs Commit View

@@ -254,7 +254,7 @@ wss.on('connection', (ws) => {
           result = await gitEngine.getStashes();
           break;
         case 'stash-save':
-          await gitEngine.stashSave(payload.message);
+          await gitEngine.stashSave(payload.message, payload.options);
           result = await gitEngine.getStashes();
           break;
         case 'stash-apply':

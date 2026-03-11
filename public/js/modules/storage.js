@@ -2,9 +2,46 @@ import { dom } from '../core/dom.js';
 import { send } from '../core/ws.js';
 import { escapeHtml } from '../core/utils.js';
 import { showModal } from '../ui/modal.js';
+import { toast } from '../ui/toast.js';
 import { renderDiff } from './diff.js';
 
 let stashesData = [];
+let stashOptions = {
+  staged: true,
+  unstaged: true,
+  untracked: false
+};
+
+function updateStashToggles() {
+  dom.stashToggleStaged.classList.toggle('active', stashOptions.staged);
+  dom.stashToggleUnstaged.classList.toggle('active', stashOptions.unstaged);
+  dom.stashToggleUntracked.classList.toggle('active', stashOptions.untracked);
+}
+
+dom.stashToggleStaged.addEventListener('click', () => {
+  stashOptions.staged = !stashOptions.staged;
+  if (!stashOptions.staged || !stashOptions.unstaged) {
+    stashOptions.untracked = false;
+  }
+  updateStashToggles();
+});
+
+dom.stashToggleUnstaged.addEventListener('click', () => {
+  stashOptions.unstaged = !stashOptions.unstaged;
+  if (!stashOptions.staged || !stashOptions.unstaged) {
+    stashOptions.untracked = false;
+  }
+  updateStashToggles();
+});
+
+dom.stashToggleUntracked.addEventListener('click', () => {
+  stashOptions.untracked = !stashOptions.untracked;
+  if (stashOptions.untracked) {
+    stashOptions.staged = true;
+    stashOptions.unstaged = true;
+  }
+  updateStashToggles();
+});
 
 export function renderStashes(stashes) {
   stashesData = stashes;
@@ -139,8 +176,13 @@ export function renderStashes(stashes) {
 
 // Wire up saving stashes
 dom.stashSaveBtn.addEventListener('click', () => {
+  if (!stashOptions.staged && !stashOptions.unstaged && !stashOptions.untracked) {
+    toast('Select at least one stash option (Staged/Unstaged)', 'warning');
+    return;
+  }
+
   const msg = dom.stashMessageInput.value.trim();
-  send('stash-save', { message: msg }).then(stashes => {
+  send('stash-save', { message: msg, options: stashOptions }).then(stashes => {
     renderStashes(stashes);
     send('status'); 
   });

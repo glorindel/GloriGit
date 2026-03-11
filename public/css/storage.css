@@ -201,10 +201,16 @@
 }
 
 /* Save Stash Input Area */
-.stash-save-area {
+.stash-save-container {
   padding: 12px 16px;
   background: var(--bg-surface);
   border-top: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.stash-save-area {
   display: flex;
   gap: 8px;
 }
@@ -224,6 +230,37 @@
   outline: none;
   border-color: var(--color-stash-base);
   box-shadow: 0 0 0 2px var(--color-stash-bg);
+}
+
+.stash-toggles-area {
+  display: flex;
+  gap: 6px;
+}
+
+.stash-toggle {
+  flex: 1;
+  background: var(--bg-base);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  border-radius: var(--radius-xs);
+  padding: 4px;
+  font-size: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.stash-toggle:hover {
+  border-color: var(--text-secondary);
+  color: var(--text-secondary);
+}
+
+.stash-toggle.active {
+  background: var(--color-stash-bg);
+  border-color: var(--color-stash-border);
+  color: var(--color-stash-base);
 }
 
 /* Stash Files Dropdown */

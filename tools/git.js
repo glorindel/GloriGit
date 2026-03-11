@@ -681,8 +681,17 @@ async function getStashDiff(index, file) {
 /**
  * Save stash
  */
-async function stashSave(message) {
+async function stashSave(message, options = {}) {
   const args = ['stash', 'push'];
+  
+  if (options.untracked) {
+    args.push('--include-untracked');
+  } else if (options.staged && !options.unstaged) {
+    args.push('--staged');
+  } else if (!options.staged && options.unstaged) {
+    args.push('--keep-index');
+  }
+
   if (message) args.push('-m', message);
   return await git(args);
 }

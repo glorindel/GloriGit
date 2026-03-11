@@ -23,7 +23,7 @@ function bindEvents() {
   dom.fhBackBtn.addEventListener('click', closeFileHistoryView);
 
   // Storage View Navigation
-  dom.storageBtn.addEventListener('click', () => {
+  dom.stashBtn.addEventListener('click', () => {
     dom.workspaceView.style.display = 'none';
     dom.commitView.style.display = 'none';
     dom.fileHistoryView.style.display = 'none';
@@ -31,7 +31,7 @@ function bindEvents() {
     send('stashes');
   });
 
-  dom.storageBackBtn.addEventListener('click', () => {
+  dom.stashBackBtn.addEventListener('click', () => {
     dom.storageView.style.display = 'none';
     dom.workspaceView.style.display = 'flex';
   });
