@@ -65,3 +65,18 @@
 ## Phase 11: Customization & Plugins
 - [ ] Theme Studio (Day/Light theme & Neon customization)
 - [ ] Web Sockets API for plugins
+
+## Phase 12: New Features (Requested)
+- [ ] Mergovanie
+- [ ] Cherry picking
+- [ ] Checkoutnutie na hociktory commit (detach head)
+- [ ] Ovládanie cez pravý klik (Context menu)
+- [ ] Pridať na vrchnú lištu zobrazenie všetkých súborov v repozitári + možnosť vyhľadávať podľa názvu
+- [ ] Zanalyzovat a pripravit pokrocilu funkcionalitu pre submoduly
+
+## Phase 13: UI Changes & Fixes (Requested)
+- [ ] Horná lišta: buttony zprava dať na ľavú stranu a logo, názov repa, path dať na pravú stranu
+- [ ] Zväčšiť dialóg na výber branche
+- [ ] Opraviť selectovanie verzií zmien v jednom súbore
+- [ ] V commit history v pravom stĺpčeku zobrazovať aktuálny dátum a čas (hh:mm)
+- [ ] História automaticky vyskrolovaná s pevnou výškou, ktorú môže užívateľ meniť (ako môže meniť šírku ľavého menu)
