@@ -144,30 +144,48 @@ export function renderStashes(stashes) {
   // Attach events
   list.querySelectorAll('.stash-apply').forEach(btn => {
     btn.onclick = () => {
-      send('stash-apply', { index: btn.dataset.index }).then(stashes => {
-        renderStashes(stashes);
-        send('status');
-      });
+      const idx = btn.dataset.index;
+      send('stash-apply', { index: idx })
+        .then(stashes => {
+          renderStashes(stashes);
+          send('status');
+          toast(`Stash@{${idx}} applied successfully`, 'success');
+        })
+        .catch(err => {
+          toast(err.details || err.error || 'Failed to apply stash', 'error');
+        });
     };
   });
 
   list.querySelectorAll('.stash-pop').forEach(btn => {
     btn.onclick = () => {
-      send('stash-pop', { index: btn.dataset.index }).then(stashes => {
-        renderStashes(stashes);
-        send('status');
-      });
+      const idx = btn.dataset.index;
+      send('stash-pop', { index: idx })
+        .then(stashes => {
+          renderStashes(stashes);
+          send('status');
+          toast(`Stash@{${idx}} popped successfully`, 'success');
+        })
+        .catch(err => {
+          toast(err.details || err.error || 'Failed to pop stash', 'error');
+        });
     };
   });
 
   list.querySelectorAll('.stash-drop').forEach(btn => {
     btn.onclick = () => {
+      const idx = btn.dataset.index;
       showModal('Drop Stash', 
-        `Are you sure you want to drop stash@{${btn.dataset.index}}? This cannot be undone.`,
+        `Are you sure you want to drop stash@{${idx}}? This cannot be undone.`,
         () => {
-          send('stash-drop', { index: btn.dataset.index }).then(stashes => {
-            renderStashes(stashes);
-          });
+          send('stash-drop', { index: idx })
+            .then(stashes => {
+              renderStashes(stashes);
+              toast(`Stash@{${idx}} dropped`, 'success');
+            })
+            .catch(err => {
+              toast(err.details || err.error || 'Failed to drop stash', 'error');
+            });
         }
       );
     };
@@ -182,10 +200,15 @@ dom.stashSaveBtn.addEventListener('click', () => {
   }
 
   const msg = dom.stashMessageInput.value.trim();
-  send('stash-save', { message: msg, options: stashOptions }).then(stashes => {
-    renderStashes(stashes);
-    send('status'); 
-  });
+  send('stash-save', { message: msg, options: stashOptions })
+    .then(stashes => {
+      renderStashes(stashes);
+      send('status'); 
+      toast('Stash saved successfully', 'success');
+    })
+    .catch(err => {
+      toast(err.details || err.error || 'Failed to save stash', 'error');
+    });
   dom.stashMessageInput.value = '';
 });
 
