@@ -250,6 +250,25 @@ wss.on('connection', (ws) => {
           await gitEngine.merge(payload.branch);
           result = await gitEngine.getStatus();
           break;
+        case 'stashes':
+          result = await gitEngine.getStashes();
+          break;
+        case 'stash-save':
+          await gitEngine.stashSave(payload.message);
+          result = await gitEngine.getStashes();
+          break;
+        case 'stash-apply':
+          await gitEngine.stashApply(payload.index);
+          result = await gitEngine.getStashes();
+          break;
+        case 'stash-pop':
+          await gitEngine.stashPop(payload.index);
+          result = await gitEngine.getStashes();
+          break;
+        case 'stash-drop':
+          await gitEngine.stashDrop(payload.index);
+          result = await gitEngine.getStashes();
+          break;
         case 'discard':
           await gitEngine.discardFile(payload.file);
           result = await gitEngine.getStatus();

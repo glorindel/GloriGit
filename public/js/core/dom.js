@@ -61,6 +61,14 @@ export const dom = {
   helpBtn: $('helpBtn'),
   helpModalOverlay: $('helpModalOverlay'),
   helpModalClose: $('helpModalClose'),
+  
+  // Storage View
+  storageBtn: $('storageBtn'),
+  storageView: $('storageView'),
+  storageBackBtn: $('storageBackBtn'),
+  stashesList: $('stashesList'),
+  stashMessageInput: $('stashMessageInput'),
+  stashSaveBtn: $('stashSaveBtn'),
   connectionStatus: $('connectionStatus'),
 
   // Workspace vs Commit View

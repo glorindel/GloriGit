@@ -22,6 +22,20 @@ function bindEvents() {
   dom.backToWorkspaceBtn.addEventListener('click', closeCommitView);
   dom.fhBackBtn.addEventListener('click', closeFileHistoryView);
 
+  // Storage View Navigation
+  dom.storageBtn.addEventListener('click', () => {
+    dom.workspaceView.style.display = 'none';
+    dom.commitView.style.display = 'none';
+    dom.fileHistoryView.style.display = 'none';
+    dom.storageView.style.display = 'flex';
+    send('stashes');
+  });
+
+  dom.storageBackBtn.addEventListener('click', () => {
+    dom.storageView.style.display = 'none';
+    dom.workspaceView.style.display = 'flex';
+  });
+
   // Branch dropdown
   dom.branchBtn.addEventListener('click', toggleBranchDropdown);
   dom.branchSearch.addEventListener('input', () => {
@@ -236,6 +250,11 @@ function bindEvents() {
       dom.helpModalOverlay.classList.remove('active');
       dom.heatmapModalOverlay.classList.remove('active');
       unselectCommit(); // Clear log selection
+
+      if (dom.storageView.style.display === 'flex') {
+        dom.storageView.style.display = 'none';
+        dom.workspaceView.style.display = 'flex';
+      }
 
       if (state.inspectingCommit) {
         closeCommitView();

@@ -14,9 +14,9 @@
   <link rel="stylesheet" href="/css/historian.css">
   <link rel="stylesheet" href="/css/diff.css">
   <link rel="stylesheet" href="/css/footer.css">
-  <link rel="stylesheet" href="/css/toast.css">
   <link rel="stylesheet" href="/css/modals.css">
   <link rel="stylesheet" href="/css/heatmap.css">
+  <link rel="stylesheet" href="/css/storage.css">
   <link rel="stylesheet" href="/css/responsive.css">
 </head>
 <body>
@@ -80,6 +80,12 @@
           <path d="M2 12h2v2H2v-2zm3-4h2v6H5V8zm3-3h2v9H8V5zm3-4h2v13h-2V1z"/>
         </svg>
         <span>Heatmap</span>
+      </button>
+      <button class="header-action" id="storageBtn" title="Deep Storage (Stashes & Remotes)">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M1 3.5c0-.626.292-1.165.7-1.59.406-.422.956-.767 1.579-1.016C4.525.396 5.966 0 8 0s3.475.397 4.72.895c.623.25 1.173.593 1.579 1.015.408.425.7 1.05.7 1.59v9c0 .626-.292 1.165-.7 1.59-.406.422-.956.767-1.579 1.016C11.475 15.604 10.034 16 8 16s-3.475-.397-4.72-.895c-.623-.25-1.173-.593-1.579-1.015C1.292 13.665 1 13.04 1 12.5v-9zm7 1.5c1.82 0 3.023-.332 3.864-.67.41-.165.688-.337.838-.475-.15-.138-.428-.31-.838-.475C11.023 3.033 9.82 2.7 8 2.7c-1.82 0-3.023.332-3.864.67-.41.165-.688.337-.838.475.15.138.428.31.838.475C4.977 4.667 6.18 5 8 5zm0 1.5c-1.396 0-2.618-.21-3.56-.492a4.9 4.9 0 01-.65-.246V7c0 .245.061.5.213.725.148.22.368.441.674.636C6.012 9.172 7.158 9.5 8 9.5c.842 0 1.988-.328 3.323-1.139.306-.195.526-.416.674-.636.152-.224.213-.48.213-.725V5.762c-.198.092-.416.18-.65.246C10.618 6.29 9.396 6.5 8 6.5zm0 4.5c-1.396 0-2.618-.21-3.56-.492a4.9 4.9 0 01-.65-.246V10c0 .245.061.5.213.725.148.22.368.441.674.636C6.012 12.172 7.158 12.5 8 12.5c.842 0 1.988-.328 3.323-1.139.306-.195.526-.416.674-.636.152-.224.213-.48.213-.725V8.762c-.198.092-.416.18-.65.246C10.618 9.29 9.396 9.5 8 9.5z"/>
+        </svg>
+        <span>Storage</span>
       </button>
 
       <button class="header-action" id="helpBtn" title="Keyboard Shortcuts (?)">
@@ -199,6 +205,32 @@
           <div class="log-entries" id="fhEntries" style="flex: 1; max-height: none; padding-top: 8px;"></div>
         </div>
       </div> <!-- /fileHistoryView -->
+
+      <!-- Storage View (Stashes & Remotes) -->
+      <div id="storageView" style="display: none; flex-direction: column; flex: 1; overflow: hidden;">
+        <div class="storage-view-header">
+          <span class="storage-title"><span class="storage-title-icon">⛁</span> Deep Storage</span>
+          <button class="back-btn" id="storageBackBtn">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M6.28 3.22a.75.75 0 0 0-1.06 0L1.47 6.97a.75.75 0 0 0 0 1.06l3.75 3.75a.75.75 0 0 0 1.06-1.06L3.56 8h10.69a.75.75 0 0 0 0-1.5H3.56l2.72-2.72a.75.75 0 0 0 0-1.06Z"/>
+            </svg>
+            Workspace
+          </button>
+        </div>
+        
+        <div class="storage-section" id="stashesSection" style="flex: 1; overflow: hidden; display: flex;">
+          <div class="storage-section-header">
+            <span class="storage-section-title title-stash">◈ Stashes</span>
+          </div>
+          <div class="stash-save-area">
+            <input type="text" id="stashMessageInput" class="stash-input" placeholder="Message to stash..." autocomplete="off">
+            <button class="storage-action-btn btn-stash" id="stashSaveBtn">Save</button>
+          </div>
+          <ul class="storage-list" id="stashesList" style="flex: 1; max-height: none;">
+            <div class="storage-empty">No stashes found</div>
+          </ul>
+        </div>
+      </div> <!-- /storageView -->
       
     </aside>
 

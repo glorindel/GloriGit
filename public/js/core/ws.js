@@ -9,6 +9,7 @@ import { renderStatus } from '../modules/status.js';
 import { renderBranches } from '../modules/branches.js';
 import { renderLog } from '../modules/log.js';
 import { renderDiff } from '../modules/diff.js';
+import { renderStashes } from '../modules/storage.js';
 
 export function connect() {
   const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
@@ -54,6 +55,9 @@ export function connect() {
         break;
       case 'branches':
         renderBranches(msg.data);
+        break;
+      case 'stashes':
+        renderStashes(msg.data);
         break;
       case 'log':
         renderLog(msg.data);

@@ -1,0 +1,227 @@
+/**
+ * Deep Storage Panel (Stashes & Remotes)
+ * Cyber-Industrial Aesthetic
+ */
+
+:root {
+  --color-stash-base: #f59e0b;
+  --color-stash-bg: rgba(245, 158, 11, 0.1);
+  --color-stash-border: rgba(245, 158, 11, 0.3);
+  --color-remote-base: #a855f7;
+  --color-remote-bg: rgba(168, 85, 247, 0.1);
+  --color-remote-border: rgba(168, 85, 247, 0.3);
+}
+
+.storage-view-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.storage-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.storage-title-icon {
+  color: var(--accent-base);
+}
+
+.storage-section {
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.storage-section-header {
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg-base);
+}
+
+.storage-section-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.title-stash {
+  color: var(--color-stash-base);
+  text-shadow: 0 0 10px var(--color-stash-bg);
+}
+
+.title-remote {
+  color: var(--color-remote-base);
+  text-shadow: 0 0 10px var(--color-remote-bg);
+}
+
+.storage-action-btn {
+  background: none;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  border-radius: var(--radius-sm);
+  padding: 4px 8px;
+  font-size: 11px;
+  font-family: 'JetBrains Mono', monospace;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.storage-action-btn:hover {
+  background: var(--bg-surface-hover);
+  color: var(--text-primary);
+  border-color: var(--text-muted);
+}
+
+.storage-action-btn.btn-stash:hover {
+  border-color: var(--color-stash-base);
+  color: var(--color-stash-base);
+  background: var(--color-stash-bg);
+}
+
+.storage-list {
+  list-style: none;
+  margin: 0;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 40vh;
+  overflow-y: auto;
+  background: var(--bg-surface);
+}
+
+.storage-empty {
+  padding: 24px 16px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  border: 1px dashed var(--border-subtle);
+  border-radius: var(--radius-sm);
+  margin: 8px;
+}
+
+/* Stash Item */
+.stash-item {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 12px;
+  background: var(--bg-base);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--color-stash-base);
+  transition: all 0.2s ease;
+  gap: 8px;
+}
+
+.stash-item:hover {
+  border-color: var(--color-stash-border);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2), 0 0 0 1px var(--color-stash-bg) inset;
+}
+
+.stash-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.stash-id {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--color-stash-base);
+  background: var(--color-stash-bg);
+  padding: 2px 6px;
+  border-radius: var(--radius-xs);
+  font-weight: 600;
+}
+
+.stash-date {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.stash-message {
+  font-size: 13px;
+  color: var(--text-primary);
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.stash-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.stash-btn {
+  flex: 1;
+  padding: 4px;
+  font-size: 11px;
+  font-family: 'JetBrains Mono', monospace;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stash-btn:hover {
+  background: var(--color-stash-bg);
+  color: var(--text-primary);
+  border-color: var(--color-stash-border);
+}
+
+.stash-btn.stash-drop:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+/* Save Stash Input Area */
+.stash-save-area {
+  padding: 12px 16px;
+  background: var(--bg-surface);
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  gap: 8px;
+}
+
+.stash-input {
+  flex: 1;
+  background: var(--bg-base);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  font-size: 12px;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.stash-input:focus {
+  outline: none;
+  border-color: var(--color-stash-base);
+  box-shadow: 0 0 0 2px var(--color-stash-bg);
+}

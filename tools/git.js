@@ -584,24 +584,100 @@ async function isGitRepo() {
   }
 }
 
+/**
+ * Get stashes
+ */
+async function getStashes() {
+  const format = '--format={"index":"%gd","hash":"%H","shortHash":"%h","date":"%aI","message":"%s"}';
+  try {
+    const output = await git(['stash', 'list', format]);
+    const lines = output.trim().split('\n').filter(Boolean);
+    return lines.map(line => {
+      // Escape problematic characters in JSON
+      const sanitized = line
+        .replace(/\\/g, '\\\\')
+        .replace(/"/g, '\\"')
+        .replace(/\\"{/g, '{"')
+        .replace(/}\\"/g, '"}')
+        .replace(/\\":/g, '":')
+        .replace(/,\\"/g, ',"')
+        .replace(/:\\"([^"]*)\\"/g, ':"$1"');
+
+      try {
+        const entry = JSON.parse(sanitized);
+        const indexMatch = entry.index.match(/stash@{(\d+)}/);
+        if (indexMatch) {
+          entry.id = parseInt(indexMatch[1], 10);
+        } else {
+          entry.id = -1;
+        }
+        return entry;
+      } catch {
+        return null;
+      }
+    }).filter(Boolean);
+  } catch (err) {
+    return [];
+  }
+}
+
+/**
+ * Save stash
+ */
+async function stashSave(message) {
+  const args = ['stash', 'push'];
+  if (message) args.push('-m', message);
+  return await git(args);
+}
+
+/**
+ * Apply stash
+ */
+async function stashApply(index) {
+  return await git(['stash', 'apply', `stash@{${index}}`]);
+}
+
+/**
+ * Pop stash
+ */
+async function stashPop(index) {
+  return await git(['stash', 'pop', `stash@{${index}}`]);
+}
+
+/**
+ * Drop stash
+ */
+async function stashDrop(index) {
+  return await git(['stash', 'drop', `stash@{${index}}`]);
+}
+
 module.exports = {
   setRepoPath,
   getRepoPath,
   getStatus,
   getLog,
+  getFileHistory,
+  getAuthorStats,
   getDiff,
   getUntrackedDiff,
+  getCommitFiles,
+  getCommitFileDiff,
+  commit,
   getBranches,
+  createBranch,
+  checkout,
+  deleteBranch,
+  push,
+  pull,
+  getStashes,
+  stashSave,
+  stashApply,
+  stashPop,
+  stashDrop,
   stage,
   unstage,
   stageAll,
   unstageAll,
-  commit,
-  push,
-  pull,
-  checkout,
-  createBranch,
-  deleteBranch,
   merge,
   discardFile,
   deleteUntrackedFile,
