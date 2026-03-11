@@ -17,6 +17,8 @@ export function renderBranches(branches) {
   if (dom.filterBranch) {
     const current = dom.filterBranch.value;
     dom.filterBranch.innerHTML = '<option value="">All Branches</option>';
+    dom.filterBranch.innerHTML += '<option value="--branches">Only local</option>';
+    dom.filterBranch.innerHTML += '<option value="--remotes">Only remote</option>';
     branches.local.forEach(b => {
       dom.filterBranch.innerHTML += `<option value="${b}" ${b === current ? 'selected' : ''}>${b}</option>`;
     });

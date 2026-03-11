@@ -89,6 +89,8 @@ export const dom = {
   filterMessage: $('filterMessage'),
   filterAuthor: $('filterAuthor'),
   filterBranch: $('filterBranch'),
+  filterSince: $('filterSince'),
+  filterUntil: $('filterUntil'),
   clearFiltersBtn: $('clearFiltersBtn'),
 
   // Heatmap Modal

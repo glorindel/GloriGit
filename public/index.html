@@ -61,6 +61,13 @@
       </div>
     </div>
     <div class="header-right">
+      <button class="header-action push" id="pushBtn" title="Push">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M8.5 14V4.207l3.146 3.147.708-.708L8 2.293 3.646 6.646l.708.708L7.5 4.207V14h1Z"/>
+          <path d="M1 1v2h14V1H1Z"/>
+        </svg>
+        <span>Push</span>
+      </button>
       <button class="header-action" id="pullBtn" title="Pull">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
           <path d="M7.5 1v9.793L4.354 7.646l-.708.708L8 12.707l4.354-4.353-.708-.708L8.5 10.793V1h-1Z"/>
@@ -74,13 +81,7 @@
         </svg>
         <span>Heatmap</span>
       </button>
-      <button class="header-action push" id="pushBtn" title="Push">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-          <path d="M8.5 14V4.207l3.146 3.147.708-.708L8 2.293 3.646 6.646l.708.708L7.5 4.207V14h1Z"/>
-          <path d="M1 1v2h14V1H1Z"/>
-        </svg>
-        <span>Push</span>
-      </button>
+
       <button class="header-action" id="helpBtn" title="Keyboard Shortcuts (?)">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="10"></circle>
@@ -246,6 +247,8 @@
         </div>
         <div class="log-filters" id="logFilters">
           <input type="text" id="graphSearch" class="graph-search-input" placeholder="🔍 Search hash..." autocomplete="off" spellcheck="false">
+          <input type="text" id="filterSince" class="graph-filter-input" title="From date" placeholder="📅 Since" onfocus="this.type='date'" onblur="if(!this.value)this.type='text'">
+          <input type="text" id="filterUntil" class="graph-filter-input" title="To date" placeholder="📅 Until" onfocus="this.type='date'" onblur="if(!this.value)this.type='text'">
           <input type="text" id="filterMessage" class="graph-filter-input" placeholder="💬 Message" autocomplete="off">
           <input type="text" id="filterAuthor" class="graph-filter-input" placeholder="👤 Author" autocomplete="off">
           <select id="filterBranch" class="graph-filter-select">
@@ -279,7 +282,10 @@
   <!-- Help Modal -->
   <div class="modal-overlay" id="helpModalOverlay">
     <div class="modal" id="helpModal" style="width: 450px;">
-      <div class="modal-header">Keyboard Shortcuts</div>
+      <div class="modal-header">
+        Keyboard Shortcuts
+        <button class="graph-filter-clear" id="helpModalClose" style="float: right; margin-top: -4px;">✕</button>
+      </div>
       <div class="modal-body">
         <table style="width: 100%; border-collapse: collapse; text-align: left; font-family: 'JetBrains Mono', monospace;">
           <tr style="border-bottom: 1px solid var(--border-subtle);"><th style="padding: 8px 0; color: var(--text-primary);">Shortcut</th><th style="padding: 8px 0; color: var(--text-primary);">Action</th></tr>
@@ -291,9 +297,7 @@
           <tr><td style="padding: 8px 0; color: var(--accent-text);">Escape</td><td style="padding: 8px 0;">Close modals / dropdowns</td></tr>
         </table>
       </div>
-      <div class="modal-actions">
-        <button class="modal-btn cancel" id="helpModalClose">Close</button>
-      </div>
+
     </div>
   </div>
 
@@ -307,7 +311,7 @@
     <div class="modal" id="heatmapModal" style="width: 800px; max-width: 90vw;">
       <div class="modal-header">
         Author Impact Heatmap (Last 90 Days)
-        <button class="help-close-btn" id="heatmapModalClose" style="float: right;">×</button>
+        <button class="graph-filter-clear" id="heatmapModalClose" style="float: right; margin-top: -4px;">✕</button>
       </div>
       <div class="modal-body" style="background: var(--bg-base); border-radius: var(--radius-sm); padding: 16px;">
         <div id="heatmapContainer" style="overflow-x: auto; min-height: 120px; display: flex; flex-direction: column; gap: 16px;">

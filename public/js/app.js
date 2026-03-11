@@ -206,11 +206,19 @@ function bindEvents() {
   dom.filterBranch.addEventListener('change', () => {
     applyFilters({ branch: dom.filterBranch.value });
   });
+  dom.filterSince.addEventListener('change', () => {
+    applyFilters({ since: dom.filterSince.value });
+  });
+  dom.filterUntil.addEventListener('change', () => {
+    applyFilters({ until: dom.filterUntil.value });
+  });
   dom.clearFiltersBtn.addEventListener('click', () => {
     dom.graphSearch.value = '';
     dom.filterMessage.value = '';
     dom.filterAuthor.value = '';
     dom.filterBranch.value = '';
+    dom.filterSince.value = '';
+    dom.filterUntil.value = '';
     clearFilters();
   });
 
