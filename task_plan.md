@@ -52,7 +52,7 @@
 - [x] Author Impact Heatmap
 
 ## Phase 9: Deep Storage (Stashes & Remotes)
-- [ ] Stash Manager
+- [x] Stash Manager
 - [ ] Remote Control UI (origin/upstream management)
 - [ ] Tagging System
 
