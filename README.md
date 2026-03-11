@@ -12,10 +12,19 @@
 
 ## Installation
 
-You can install GloriGit globally to make the `glorigit` command available anywhere on your system:
+### For Users
+Install GloriGit globally to make the `glorigit` command available anywhere on your system:
 
 ```bash
 npm install -g glorigit
+```
+
+### For Developers (Local Development)
+If you've cloned the repository and want to run it globally while testing changes:
+
+```bash
+# Inside the GloriGit repository folder
+npm link
 ```
 
 ## Usage
@@ -27,19 +36,15 @@ cd your-project-folder
 glorigit
 ```
 
-You can also run it without installing it via npx:
+Or specify a path directly:
 ```bash
-npx glorigit
+glorigit /path/to/repo
 ```
 
-Or clone and run locally:
-
-```bash
-git clone https://github.com/yourname/glorigit.git
-cd glorigit
-npm install
-npm run dev
-```
+### Options
+- `--help`: Show usage information
+- `--version`: Show current version
+- `npx glorigit`: Run without permanent installation
 
 ## Keyboard Shortcuts
 

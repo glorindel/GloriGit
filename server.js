@@ -18,8 +18,33 @@ const PORT = process.env.GLORIGIT_PORT || 3847;
 const HOST = '127.0.0.1';
 const PUBLIC_DIR = path.join(__dirname, 'public');
 
-// Determine target repo path from CLI args or current working directory
-const targetRepo = process.argv[2] || process.cwd();
+// --- CLI Argument Handling ---
+const args = process.argv.slice(2);
+const version = require('./package.json').version;
+
+if (args.includes('--help') || args.includes('-h')) {
+  console.log(`
+GloriGit v${version}
+Super lightweight, blazing-fast Git UI
+
+Usage:
+  glorigit [path]    Open repo at [path] or current directory
+  glorigit --help    Show this help message
+  glorigit --version Show version
+
+Environment Variables:
+  GLORIGIT_PORT      Port to listen on (default: 3847)
+`);
+  process.exit(0);
+}
+
+if (args.includes('--version') || args.includes('-v')) {
+  console.log(`GloriGit v${version}`);
+  process.exit(0);
+}
+
+// Determine target repo path from first non-flag argument or current working directory
+const targetRepo = args.find(arg => !arg.startsWith('-')) || process.cwd();
 gitEngine.setRepoPath(path.resolve(targetRepo));
 
 // --- MIME Types ---
@@ -134,6 +159,7 @@ const server = http.createServer((req, res) => {
 
 // --- WebSocket Server ---
 const wss = new WebSocketServer({ server });
+wss.on('error', () => {}); // Prevent crash on server error (e.g. EADDRINUSE)
 
 wss.on('connection', (ws) => {
   console.log('🔌 Client connected');
@@ -325,34 +351,49 @@ async function start() {
 
   const repoName = await gitEngine.getRepoName();
 
-  server.listen(PORT, HOST, () => {
-    console.log('');
-    console.log('  ┌──────────────────────────────────────┐');
-    console.log('  │                                      │');
-    console.log('  │   ✨  GloriGit is running!           │');
-    console.log('  │                                      │');
-    console.log(`  │   📁  ${repoName.padEnd(30)}  │`);
-    console.log(`  │   🌐  http://${HOST}:${PORT}         │`);
-    console.log('  │                                      │');
-    console.log('  │   Press Ctrl+C to stop               │');
-    console.log('  │                                      │');
-    console.log('  └──────────────────────────────────────┘');
-    console.log('');
+  function listen(port) {
+    server.listen(port, HOST, () => {
+      console.log('');
+      console.log('  ┌──────────────────────────────────────┐');
+      console.log('  │                                      │');
+      console.log('  │   ✨  GloriGit is running!           │');
+      console.log('  │                                      │');
+      console.log(`  │   📁  ${repoName.padEnd(30)}  │`);
+      console.log(`  │   🌐  http://${HOST}:${port}         │`);
+      console.log('  │                                      │');
+      console.log('  │   Press Ctrl+C to stop               │');
+      console.log('  │                                      │');
+      console.log('  └──────────────────────────────────────┘');
+      console.log('');
 
-    startWatcher();
+      startWatcher();
 
-    // Auto-open browser (Windows, macOS, Linux)
-    const { exec } = require('child_process');
-    const url = `http://${HOST}:${PORT}`;
+      // Auto-open browser (Windows, macOS, Linux)
+      const { exec } = require('child_process');
+      const url = `http://${HOST}:${port}`;
 
-    if (process.platform === 'win32') {
-      exec(`start ${url}`);
-    } else if (process.platform === 'darwin') {
-      exec(`open ${url}`);
+      if (process.platform === 'win32') {
+        exec(`start ${url}`);
+      } else if (process.platform === 'darwin') {
+        exec(`open ${url}`);
+      } else {
+        exec(`xdg-open ${url}`);
+      }
+    });
+  }
+
+  server.on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+      const nextPort = parseInt(server.address()?.port || PORT) + 1;
+      console.log(`⚠️  Port ${nextPort - 1} is in use, trying ${nextPort}...`);
+      listen(nextPort);
     } else {
-      exec(`xdg-open ${url}`);
+      console.error('❌ Server error:', err);
+      process.exit(1);
     }
   });
+
+  listen(PORT);
 }
 
 start();
