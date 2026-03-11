@@ -644,9 +644,9 @@ async function getStashes() {
  * Get files in a stash
  */
 async function getStashFiles(index) {
-  // `git stash show --name-status stash@{X}`
+  // `git stash show --name-status --include-untracked stash@{X}`
   try {
-    const output = await git(['stash', 'show', '--name-status', `stash@{${index}}`]);
+    const output = await git(['stash', 'show', '--name-status', '--include-untracked', `stash@{${index}}`]);
     const files = [];
     const lines = output.trim().split('\n').filter(Boolean);
     for (const line of lines) {
@@ -671,7 +671,20 @@ async function getStashFiles(index) {
  */
 async function getStashDiff(index, file) {
   try {
-    const output = await git(['diff', `stash@{${index}}^..stash@{${index}}`, '--', file]);
+    let output = await git(['diff', `stash@{${index}}^..stash@{${index}}`, '--', file]);
+    
+    // If output is empty, it might be an untracked file stored in stash@{X}^3
+    if (!output.trim()) {
+      try {
+        const untrackedOutput = await git(['diff', '4b825dc642cb6eb9a060e54bf8d69288fbee4904', `stash@{${index}}^3`, '--', file]);
+        if (untrackedOutput.trim()) {
+          output = untrackedOutput;
+        }
+      } catch (err) {
+        // Ignored, not an untracked file or stash doesn't have a ^3 parent
+      }
+    }
+    
     return parseDiff(output, file);
   } catch (err) {
     return { file, hunks: [] };
