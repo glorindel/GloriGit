@@ -86,8 +86,9 @@ export function renderStashes(stashes) {
                 const diff = await send('stash-diff', { index: stash.id, file: f.file });
                 
                 // Show in the diff panel
-                const contentStr = diff.hunks.length === 0 ? 'Binary file or no text changes.' : null;
-                renderDiff(f.file, diff.hunks, true, contentStr, f.status);
+                dom.diffFilename.textContent = f.file;
+                dom.diffActions.style.display = 'none'; // hide stage/discard buttons for stashes
+                renderDiff(diff);
                 
                 // To support returning to diff view later
                 // Ideally we'd set state, but rendering it directly works for display
