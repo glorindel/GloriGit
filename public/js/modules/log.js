@@ -252,25 +252,33 @@ function renderLogEntries(log) {
     if (branchRefs.head) div.classList.add('is-head');
 
     let refsHtml = '';
-    if (branchRefs.head && branchRefs.local.length > 0) {
-      const bc = branchColor(branchRefs.local[0]);
-      refsHtml += `<span class="log-ref ref-head" style="background:${bc};border-color:${bc};color:#0c1018">${escapeHtml(branchRefs.local[0])}</span>`;
-      branchRefs.local.slice(1).forEach(b => {
-        const c = branchColor(b);
-        refsHtml += `<span class="log-ref ref-local" style="background:${c};border-color:${c};color:#0c1018">${escapeHtml(b)}</span>`;
-      });
-    } else {
-      branchRefs.local.forEach(b => {
-        const c = branchColor(b);
-        refsHtml += `<span class="log-ref ref-local" style="background:${c};border-color:${c};color:#0c1018">${escapeHtml(b)}</span>`;
+    
+    // Local / HEAD refs (skip if filtering for only remotes)
+    if (filterState.branch !== '--remotes') {
+      if (branchRefs.head && branchRefs.local.length > 0) {
+        const bc = branchColor(branchRefs.local[0]);
+        refsHtml += `<span class="log-ref ref-head" style="background:${bc};border-color:${bc};color:#0c1018">${escapeHtml(branchRefs.local[0])}</span>`;
+        branchRefs.local.slice(1).forEach(b => {
+          const c = branchColor(b);
+          refsHtml += `<span class="log-ref ref-local" style="background:${c};border-color:${c};color:#0c1018">${escapeHtml(b)}</span>`;
+        });
+      } else {
+        branchRefs.local.forEach(b => {
+          const c = branchColor(b);
+          refsHtml += `<span class="log-ref ref-local" style="background:${c};border-color:${c};color:#0c1018">${escapeHtml(b)}</span>`;
+        });
+      }
+    }
+
+    // Remote refs (skip if filtering for only local)
+    if (filterState.branch !== '--branches') {
+      branchRefs.remote.forEach(b => {
+        // Strip "origin/" prefix to match the local branch color
+        const baseName = b.replace(/^origin\//, '');
+        const c = branchColor(baseName);
+        refsHtml += `<span class="log-ref ref-remote" style="color:${c};border-color:${c}">${escapeHtml(b)}</span>`;
       });
     }
-    branchRefs.remote.forEach(b => {
-      // Strip "origin/" prefix to match the local branch color
-      const baseName = b.replace(/^origin\//, '');
-      const c = branchColor(baseName);
-      refsHtml += `<span class="log-ref ref-remote" style="color:${c};border-color:${c}">${escapeHtml(b)}</span>`;
-    });
     branchRefs.tags.forEach(t => {
       refsHtml += `<span class="log-ref ref-tag">🏷 ${escapeHtml(t)}</span>`;
     });

@@ -251,6 +251,19 @@ describe('WebSocket Server', () => {
     assert.ok(msg.data[0].hash, 'first commit should have hash');
   });
   
+  it('action: log with filters → should return filtered commits', async () => {
+    // Test branch filter
+    const msgBranch = await wsSend(ws, 'log', { count: 5, branch: '--branches' });
+    assert.equal(msgBranch.action, 'log');
+    assert.ok(Array.isArray(msgBranch.data));
+    
+    // Test date filters
+    const validDate = new Date().toISOString().split('T')[0]; // today
+    const msgDate = await wsSend(ws, 'log', { count: 5, since: '2000-01-01', until: validDate });
+    assert.equal(msgDate.action, 'log');
+    assert.ok(Array.isArray(msgDate.data));
+  });
+  
   it('action: commit-files → should return files for a commit', async () => {
     // First get a commit hash
     const logMsg = await wsSend(ws, 'log', { count: 1 });
