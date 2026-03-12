@@ -73,6 +73,7 @@
 - [ ] Ovládanie cez pravý klik (Context menu)
 - [ ] Pridať na vrchnú lištu zobrazenie všetkých súborov v repozitári + možnosť vyhľadávať podľa názvu
 - [ ] Zanalyzovat a pripravit pokrocilu funkcionalitu pre submoduly
+- [ ] Vždy pri súboroch zobrazovať ikonku hodin - historie vsetkych zmien ako ked je subor v stave modified/staged, kde toto ikonu zobrazujeme 
 
 ## Phase 13: UI Changes & Fixes (Requested)
 - [ ] Horná lišta: buttony zprava dať na ľavú stranu a logo, názov repa, path dať na pravú stranu
@@ -80,3 +81,4 @@
 - [ ] Opraviť selectovanie verzií zmien v jednom súbore
 - [ ] V commit history v pravom stĺpčeku zobrazovať aktuálny dátum a čas (hh:mm)
 - [ ] História automaticky vyskrolovaná s pevnou výškou, ktorú môže užívateľ meniť (ako môže meniť šírku ľavého menu)
+- [ ] Teraz keď sa zobrazuje diff súboru a riadok je širší ako okno, každý riadok má svoj horizontálny scrollbar, myslím, že lepšie bude jeden spoločný horizontálny scrollbar na spodku diff okna
