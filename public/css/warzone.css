@@ -1,0 +1,1003 @@
+/* ============================================
+   GloriGit — Warzone CSS (Phase 7)
+   Conflict Resolver + Merge Preview + Rebase UI
+   ============================================ */
+
+/* --- Token Overrides for Warzone --- */
+:root {
+  --conflict-red: #ef4444;
+  --conflict-red-dim: rgba(239, 68, 68, 0.14);
+  --conflict-red-glow: rgba(239, 68, 68, 0.3);
+  --conflict-ours: rgba(34, 211, 238, 0.09);
+  --conflict-theirs: rgba(239, 68, 68, 0.09);
+  --rebase-purple: #a78bfa;
+  --rebase-purple-dim: rgba(167, 139, 250, 0.12);
+  --warning-orange: #fb923c;
+  --warning-orange-dim: rgba(251, 146, 60, 0.13);
+}
+
+/* ───────────────────────────────────────
+   Warzone Header Button
+─────────────────────────────────────── */
+.header-action.warzone {
+  position: relative;
+  border-color: var(--conflict-red) !important;
+  color: var(--conflict-red) !important;
+  transition: background var(--speed-fast), box-shadow var(--speed-fast), color var(--speed-fast);
+}
+
+.header-action.warzone:hover {
+  background: var(--conflict-red-dim) !important;
+  box-shadow: 0 0 12px var(--conflict-red-glow);
+}
+
+.header-action.warzone.active,
+.header-action.warzone.has-conflicts {
+  background: var(--conflict-red-dim) !important;
+  box-shadow: 0 0 14px var(--conflict-red-glow);
+  animation: warzone-pulse-border 2s ease-in-out infinite;
+}
+
+@keyframes warzone-pulse-border {
+  0%, 100% { box-shadow: 0 0 6px var(--conflict-red-glow); }
+  50%       { box-shadow: 0 0 18px var(--conflict-red-glow), 0 0 6px var(--conflict-red); }
+}
+
+/* Badge indicator */
+.warzone-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 8px;
+  height: 8px;
+  background: var(--conflict-red);
+  border-radius: 50%;
+  border: 2px solid var(--bg-base);
+  animation: warzone-badge-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes warzone-badge-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50%       { transform: scale(1.4); opacity: 0.75; }
+}
+
+/* ───────────────────────────────────────
+   Conflict Banner (inside diff panel)
+─────────────────────────────────────── */
+.conflict-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  background:
+    repeating-linear-gradient(
+      -45deg,
+      var(--conflict-red-dim) 0px,
+      var(--conflict-red-dim) 3px,
+      transparent 3px,
+      transparent 12px
+    ),
+    var(--bg-raised);
+  border-bottom: 1px solid var(--conflict-red);
+  color: var(--conflict-red);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  flex-shrink: 0;
+  animation: conflict-banner-in 0.3s var(--ease) both;
+}
+
+@keyframes conflict-banner-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.conflict-banner-icon {
+  font-size: 16px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.conflict-banner-text {
+  flex: 1;
+}
+
+.conflict-banner-count {
+  background: var(--conflict-red);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 10px;
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+}
+
+.conflict-banner-abort {
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--conflict-red);
+  background: transparent;
+  color: var(--conflict-red);
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--speed-fast), color var(--speed-fast);
+  flex-shrink: 0;
+}
+
+.conflict-banner-abort:hover {
+  background: var(--conflict-red);
+  color: #fff;
+}
+
+/* ───────────────────────────────────────
+   Conflict Resolver (replaces diff content)
+─────────────────────────────────────── */
+.conflict-resolver {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  animation: conflict-slide-in 0.25s var(--ease) both;
+}
+
+@keyframes conflict-slide-in {
+  from { opacity: 0; transform: translateX(10px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.conflict-resolver-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--bg-raised);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.conflict-resolver-title {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--conflict-red);
+}
+
+.conflict-resolver-file {
+  font-size: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-secondary);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.conflict-resolver-save {
+  padding: 5px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--green);
+  background: var(--green-dim);
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--speed-fast), box-shadow var(--speed-fast);
+}
+
+.conflict-resolver-save:hover {
+  background: var(--green);
+  color: var(--bg-deep);
+  box-shadow: 0 0 10px rgba(52, 211, 153, 0.4);
+}
+
+.conflict-resolver-save:disabled {
+  opacity: 0.4;
+  cursor: default;
+  background: var(--green-dim);
+  color: var(--green);
+  box-shadow: none;
+}
+
+.conflict-sections {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Individual conflict block */
+.conflict-block {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--bg-base);
+  transition: border-color var(--speed-fast);
+}
+
+.conflict-block.resolved {
+  border-color: var(--green);
+}
+
+.conflict-block-header {
+  display: flex;
+  align-items: center;
+  padding: 6px 12px;
+  background: var(--bg-raised);
+  border-bottom: 1px solid var(--border);
+  gap: 8px;
+}
+
+.conflict-block-num {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.conflict-block-status {
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 8px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.conflict-block-status.unresolved {
+  background: var(--conflict-red-dim);
+  color: var(--conflict-red);
+}
+
+.conflict-block-status.resolved-badge {
+  background: var(--green-dim);
+  color: var(--green);
+  animation: resolved-tick 0.3s var(--ease-bounce) both;
+}
+
+@keyframes resolved-tick {
+  from { transform: scale(0.8); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+.conflict-block-actions {
+  display: flex;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.conflict-resolve-btn {
+  padding: 3px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--speed-fast), color var(--speed-fast), transform var(--speed-fast);
+}
+
+.conflict-resolve-btn:active {
+  transform: scale(0.96);
+}
+
+.conflict-resolve-btn.ours {
+  border-color: var(--accent-dim);
+  color: var(--accent-text);
+  background: var(--accent-glow);
+}
+
+.conflict-resolve-btn.ours:hover {
+  background: var(--accent-dim);
+  color: var(--bg-deep);
+}
+
+.conflict-resolve-btn.theirs {
+  border-color: var(--conflict-red);
+  color: var(--conflict-red);
+  background: var(--conflict-red-dim);
+}
+
+.conflict-resolve-btn.theirs:hover {
+  background: var(--conflict-red);
+  color: #fff;
+}
+
+.conflict-resolve-btn.both {
+  border-color: var(--yellow);
+  color: var(--yellow);
+  background: var(--yellow-dim);
+}
+
+.conflict-resolve-btn.both:hover {
+  background: var(--yellow);
+  color: var(--bg-deep);
+}
+
+/* Two-column pane layout */
+.conflict-panes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+}
+
+.conflict-pane {
+  padding: 10px 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-all;
+  overflow-x: auto;
+  min-height: 40px;
+}
+
+.conflict-pane.ours-pane {
+  background: var(--conflict-ours);
+  border-right: 1px solid var(--border);
+}
+
+.conflict-pane.theirs-pane {
+  background: var(--conflict-theirs);
+}
+
+.conflict-pane-label {
+  display: block;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 6px;
+  opacity: 0.6;
+}
+
+.ours-pane .conflict-pane-label  { color: var(--accent-text); }
+.theirs-pane .conflict-pane-label { color: var(--conflict-red); }
+
+.conflict-pane-empty {
+  color: var(--text-muted);
+  font-style: italic;
+  font-size: 11px;
+}
+
+/* Resolved preview */
+.conflict-resolved-preview {
+  padding: 10px 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  background: var(--green-dim);
+  color: var(--green);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.conflict-no-conflicts {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 12px;
+  color: var(--text-muted);
+}
+
+.conflict-no-conflicts-icon {
+  font-size: 36px;
+}
+
+/* ───────────────────────────────────────
+   Rebase Status Bar (inside sidebar)
+─────────────────────────────────────── */
+.rebase-status-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--rebase-purple-dim);
+  border-bottom: 1px solid var(--rebase-purple);
+  flex-shrink: 0;
+  animation: conflict-banner-in 0.3s var(--ease) both;
+}
+
+.rebase-status-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--rebase-purple);
+  letter-spacing: 0.03em;
+  flex: 1;
+}
+
+.rebase-status-step {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.rebase-control-btn {
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--speed-fast), color var(--speed-fast);
+}
+
+.rebase-control-btn.continue {
+  border-color: var(--green);
+  color: var(--green);
+  background: var(--green-dim);
+}
+
+.rebase-control-btn.continue:hover {
+  background: var(--green);
+  color: var(--bg-deep);
+}
+
+.rebase-control-btn.skip {
+  border-color: var(--yellow);
+  color: var(--yellow);
+  background: var(--yellow-dim);
+}
+
+.rebase-control-btn.skip:hover {
+  background: var(--yellow);
+  color: var(--bg-deep);
+}
+
+.rebase-control-btn.abort {
+  border-color: var(--conflict-red);
+  color: var(--conflict-red);
+  background: var(--conflict-red-dim);
+}
+
+.rebase-control-btn.abort:hover {
+  background: var(--conflict-red);
+  color: #fff;
+}
+
+/* ───────────────────────────────────────
+   Warzone Modal (shared base)
+─────────────────────────────────────── */
+.warzone-modal {
+  width: 640px;
+  max-width: 92vw;
+  max-height: 84vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.warzone-modal .modal-body {
+  flex: 1;
+  overflow-y: auto;
+  max-height: 60vh;
+}
+
+.warzone-modal-subtitle {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 4px;
+  line-height: 1.5;
+}
+
+/* ───────────────────────────────────────
+   Merge Preview Modal
+─────────────────────────────────────── */
+.merge-preview-branch-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-overlay);
+  border: 1px solid var(--border);
+  color: var(--accent-text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  margin: 10px 0;
+}
+
+.merge-preview-file-list {
+  list-style: none;
+  margin: 8px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.merge-preview-file-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-base);
+  font-size: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  transition: background var(--speed-fast);
+}
+
+.merge-preview-file-item:hover {
+  background: var(--bg-hover);
+}
+
+.merge-preview-status {
+  width: 18px;
+  height: 18px;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.merge-preview-status.M { background: var(--yellow-dim); color: var(--yellow); }
+.merge-preview-status.A { background: var(--green-dim);  color: var(--green); }
+.merge-preview-status.D { background: var(--red-dim);    color: var(--red); }
+.merge-preview-status.conflict { background: var(--conflict-red-dim); color: var(--conflict-red); }
+
+.merge-preview-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+  justify-content: flex-end;
+}
+
+.merge-preview-proceed-btn {
+  padding: 6px 18px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--green);
+  background: var(--green-dim);
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--speed-fast), box-shadow var(--speed-fast);
+}
+
+.merge-preview-proceed-btn:hover {
+  background: var(--green);
+  color: var(--bg-deep);
+  box-shadow: 0 0 12px rgba(52, 211, 153, 0.4);
+}
+
+.merge-preview-cancel-btn {
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 12px;
+  cursor: pointer;
+  transition: background var(--speed-fast), color var(--speed-fast);
+}
+
+.merge-preview-cancel-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.merge-preview-empty {
+  padding: 24px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.merge-preview-loading {
+  padding: 24px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 12px;
+  animation: mp-fade 1s ease-in-out infinite alternate;
+}
+
+@keyframes mp-fade {
+  from { opacity: 0.6; }
+  to   { opacity: 1; }
+}
+
+/* ───────────────────────────────────────
+   Interactive Rebase Modal
+─────────────────────────────────────── */
+.rebase-target-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.rebase-target-input {
+  flex: 1;
+  padding: 7px 10px;
+  background: var(--bg-base);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  outline: none;
+  transition: border-color var(--speed-fast);
+}
+
+.rebase-target-input:focus {
+  border-color: var(--rebase-purple);
+}
+
+.rebase-load-btn {
+  padding: 7px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--rebase-purple);
+  background: var(--rebase-purple-dim);
+  color: var(--rebase-purple);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--speed-fast), color var(--speed-fast);
+  white-space: nowrap;
+}
+
+.rebase-load-btn:hover {
+  background: var(--rebase-purple);
+  color: var(--bg-deep);
+}
+
+.rebase-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+.rebase-todo-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-height: 40px;
+}
+
+.rebase-todo-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: grab;
+  transition: background var(--speed-fast), border-color var(--speed-fast), opacity var(--speed-fast), transform var(--speed-fast);
+  user-select: none;
+}
+
+.rebase-todo-item:hover {
+  background: var(--bg-hover);
+  border-color: var(--rebase-purple);
+}
+
+.rebase-todo-item.dragging {
+  opacity: 0.5;
+  transform: scale(0.98);
+  cursor: grabbing;
+}
+
+.rebase-todo-item.drop-over {
+  border-color: var(--rebase-purple);
+  background: var(--rebase-purple-dim);
+}
+
+.rebase-drag-handle {
+  color: var(--text-muted);
+  font-size: 13px;
+  cursor: grab;
+  flex-shrink: 0;
+}
+
+.rebase-action-select {
+  padding: 3px 6px;
+  background: var(--bg-overlay);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 11px;
+  font-family: 'JetBrains Mono', monospace;
+  outline: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  width: 80px;
+  transition: border-color var(--speed-fast);
+}
+
+.rebase-action-select:focus {
+  border-color: var(--rebase-purple);
+}
+
+.rebase-action-select option { background: var(--bg-overlay); }
+
+.rebase-commit-hash {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--accent-text);
+  background: var(--accent-glow);
+  padding: 2px 6px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.rebase-commit-msg {
+  font-size: 12px;
+  color: var(--text-primary);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rebase-todo-item.action-drop .rebase-commit-msg {
+  opacity: 0.4;
+  text-decoration: line-through;
+}
+
+.rebase-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 14px;
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 14px;
+}
+
+.rebase-start-btn {
+  padding: 7px 20px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--rebase-purple);
+  background: var(--rebase-purple-dim);
+  color: var(--rebase-purple);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--speed-fast), box-shadow var(--speed-fast);
+}
+
+.rebase-start-btn:hover:not(:disabled) {
+  background: var(--rebase-purple);
+  color: var(--bg-deep);
+  box-shadow: 0 0 12px rgba(167, 139, 250, 0.4);
+}
+
+.rebase-start-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.rebase-cancel-btn {
+  padding: 7px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 12px;
+  cursor: pointer;
+  transition: background var(--speed-fast), color var(--speed-fast);
+}
+
+.rebase-cancel-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.rebase-empty-hint {
+  padding: 20px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 12px;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-sm);
+}
+
+/* ───────────────────────────────────────
+   Warzone Panel (sidebar view for conflicts)
+─────────────────────────────────────── */
+.warzone-view-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  background: var(--bg-raised);
+}
+
+.warzone-view-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--conflict-red);
+  flex: 1;
+}
+
+.warzone-section-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  padding: 10px 12px 5px;
+  flex-shrink: 0;
+}
+
+.conflict-file-list {
+  list-style: none;
+  padding: 0 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.conflict-file-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-base);
+  cursor: pointer;
+  border: 1px solid var(--border);
+  transition: background var(--speed-fast), border-color var(--speed-fast);
+  animation: conflict-file-in 0.2s var(--ease) both;
+}
+
+@keyframes conflict-file-in {
+  from { opacity: 0; transform: translateX(-6px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.conflict-file-item:hover {
+  background: var(--conflict-red-dim);
+  border-color: var(--conflict-red);
+}
+
+.conflict-file-item.active {
+  background: var(--conflict-red-dim);
+  border-color: var(--conflict-red);
+}
+
+.conflict-file-icon {
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.conflict-file-name {
+  font-size: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-primary);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.conflict-file-resolved-check {
+  color: var(--green);
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+/* Warzone actions panel */
+.warzone-actions-panel {
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-top: 1px solid var(--border-subtle);
+  flex-shrink: 0;
+}
+
+.warzone-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-raised);
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  transition: background var(--speed-fast), border-color var(--speed-fast), color var(--speed-fast);
+}
+
+.warzone-action-btn:hover {
+  background: var(--bg-hover);
+  border-color: var(--accent-dim);
+  color: var(--accent-text);
+}
+
+.warzone-action-btn.danger:hover {
+  background: var(--conflict-red-dim);
+  border-color: var(--conflict-red);
+  color: var(--conflict-red);
+}
+
+.warzone-action-btn .action-icon {
+  font-size: 16px;
+  width: 20px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.warzone-back-btn {
+  padding: 5px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 11px;
+  cursor: pointer;
+  transition: background var(--speed-fast), color var(--speed-fast);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.warzone-back-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.warzone-no-conflicts {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px 20px;
+  gap: 10px;
+  text-align: center;
+}
+
+.warzone-no-conflicts-icon {
+  font-size: 32px;
+}
+
+.warzone-no-conflicts-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.warzone-no-conflicts-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+/* Merge status info strip */
+.warzone-merge-info {
+  padding: 8px 12px;
+  background: var(--rebase-purple-dim);
+  border-bottom: 1px solid var(--rebase-purple);
+  font-size: 11px;
+  color: var(--rebase-purple);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.warzone-cherry-pick-info {
+  background: var(--warning-orange-dim);
+  border-bottom-color: var(--warning-orange);
+  color: var(--warning-orange);
+}

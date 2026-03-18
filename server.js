@@ -304,6 +304,41 @@ wss.on('connection', (ws) => {
           result = await gitEngine.getAuthorStats(payload.days || 90);
           break;
 
+        // --- Phase 7: Conflict Warzone ---
+        case 'merge-status':
+          result = await gitEngine.getMergeStatus();
+          break;
+        case 'conflicts':
+          result = await gitEngine.getConflicts(payload.file);
+          break;
+        case 'resolve-conflict':
+          result = await gitEngine.resolveConflict(payload.file, payload.content);
+          break;
+        case 'merge-preview':
+          result = await gitEngine.getMergePreview(payload.branch);
+          break;
+        case 'abort-merge':
+          result = await gitEngine.abortMerge();
+          break;
+        case 'rebase-status':
+          result = await gitEngine.getRebaseStatus();
+          break;
+        case 'rebase-start':
+          result = await gitEngine.rebaseStart(payload.branch);
+          break;
+        case 'rebase-apply':
+          result = await gitEngine.rebaseApply(payload.branch, payload.todoList);
+          break;
+        case 'rebase-continue':
+          result = await gitEngine.rebaseContinue();
+          break;
+        case 'rebase-skip':
+          result = await gitEngine.rebaseSkip();
+          break;
+        case 'rebase-abort':
+          result = await gitEngine.rebaseAbort();
+          break;
+
         default:
           ws.send(JSON.stringify({ id, error: `Unknown action: ${action}` }));
           return;
@@ -315,7 +350,8 @@ wss.on('connection', (ws) => {
       const mutatingActions = [
         'stage', 'unstage', 'stage-all', 'unstage-all',
         'commit', 'push', 'pull', 'checkout', 'create-branch',
-        'delete-branch', 'merge', 'discard', 'discard-untracked'
+        'delete-branch', 'merge', 'discard', 'discard-untracked',
+        'resolve-conflict', 'abort-merge', 'rebase-continue', 'rebase-abort', 'rebase-skip'
       ];
       if (mutatingActions.includes(action)) {
         broadcastStatus();

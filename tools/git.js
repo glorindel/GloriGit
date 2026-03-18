@@ -744,6 +744,328 @@ async function stashDrop(index) {
   return await git(['stash', 'drop', `stash@{${index}}`]);
 }
 
+// ============================================================
+// Phase 7: Conflict Warzone
+// ============================================================
+
+/**
+ * Get current merge/rebase state and conflicted files
+ */
+async function getMergeStatus() {
+  const fs = require('fs');
+  const gitDir = path.join(repoPath, '.git');
+
+  const merging = fs.existsSync(path.join(gitDir, 'MERGE_HEAD'));
+  const rebasingMerge = fs.existsSync(path.join(gitDir, 'rebase-merge'));
+  const rebasingApply = fs.existsSync(path.join(gitDir, 'rebase-apply'));
+  const rebasing = rebasingMerge || rebasingApply;
+  const cherryPicking = fs.existsSync(path.join(gitDir, 'CHERRY_PICK_HEAD'));
+
+  // Find conflicted files via git status porcelain
+  let conflicted = [];
+  try {
+    const output = await git(['status', '--porcelain']);
+    const lines = output.split('\n').filter(Boolean);
+    for (const line of lines) {
+      const xy = line.substring(0, 2);
+      const file = line.substring(3).trim();
+      // Conflict codes: UU, AA, DD, AU, UA, DU, UD
+      if (['UU', 'AA', 'DD', 'AU', 'UA', 'DU', 'UD'].includes(xy)) {
+        conflicted.push(file);
+      }
+    }
+  } catch {}
+
+  // Get merge branch name if merging
+  let mergeBranch = null;
+  if (merging) {
+    try {
+      const mergeHead = fs.readFileSync(path.join(gitDir, 'MERGE_HEAD'), 'utf8').trim();
+      // Try to resolve to a branch name
+      const output = await git(['name-rev', '--name-only', mergeHead]);
+      mergeBranch = output.trim();
+    } catch {}
+  }
+
+  // Get rebase info
+  let rebaseBranch = null;
+  let rebaseStep = null;
+  let rebaseTotal = null;
+  if (rebasingMerge) {
+    try {
+      const headName = fs.readFileSync(path.join(gitDir, 'rebase-merge', 'head-name'), 'utf8').trim();
+      rebaseBranch = headName.replace('refs/heads/', '');
+      const msgnum = fs.readFileSync(path.join(gitDir, 'rebase-merge', 'msgnum'), 'utf8').trim();
+      const end = fs.readFileSync(path.join(gitDir, 'rebase-merge', 'end'), 'utf8').trim();
+      rebaseStep = parseInt(msgnum);
+      rebaseTotal = parseInt(end);
+    } catch {}
+  }
+
+  return { merging, rebasing, cherryPicking, conflicted, mergeBranch, rebaseBranch, rebaseStep, rebaseTotal };
+}
+
+/**
+ * Parse conflict markers in a file and return structured sections
+ */
+async function getConflicts(file) {
+  const fs = require('fs');
+  const fullPath = path.join(repoPath, file);
+
+  let content;
+  try {
+    content = fs.readFileSync(fullPath, 'utf8');
+  } catch (err) {
+    return { file, sections: [], error: err.message };
+  }
+
+  const lines = content.split('\n');
+  const sections = [];
+  let i = 0;
+
+  while (i < lines.length) {
+    if (lines[i].startsWith('<<<<<<<')) {
+      const section = { ours: [], base: [], theirs: [], startLine: i };
+      const oursLabel = lines[i].substring(8).trim();
+      i++;
+
+      // Collect ours lines
+      while (i < lines.length && !lines[i].startsWith('=======') && !lines[i].startsWith('|||||||')) {
+        section.ours.push(lines[i]);
+        i++;
+      }
+
+      // Optional: diff3 base section
+      if (i < lines.length && lines[i].startsWith('|||||||')) {
+        i++;
+        while (i < lines.length && !lines[i].startsWith('=======')) {
+          section.base.push(lines[i]);
+          i++;
+        }
+      }
+
+      // Skip separator
+      if (i < lines.length && lines[i].startsWith('=======')) i++;
+
+      const theirsLabel = '';
+      // Collect theirs lines
+      while (i < lines.length && !lines[i].startsWith('>>>>>>>')) {
+        section.theirs.push(lines[i]);
+        i++;
+      }
+
+      // Skip closing marker
+      const theirsMarker = i < lines.length ? lines[i] : '';
+      section.theirsLabel = theirsMarker.substring(8).trim();
+      section.oursLabel = oursLabel;
+      i++;
+      sections.push(section);
+    } else {
+      i++;
+    }
+  }
+
+  return { file, sections, rawContent: content };
+}
+
+/**
+ * Write resolved content to file and stage it
+ */
+async function resolveConflict(file, content) {
+  const fs = require('fs');
+  const fullPath = path.join(repoPath, file);
+  fs.writeFileSync(fullPath, content, 'utf8');
+  await git(['add', '--', file]);
+  return getStatus();
+}
+
+/**
+ * Preview what files would change if we merge a branch (dry-run, aborts after)
+ */
+async function getMergePreview(branch) {
+  // Try dry-run merge — this modifies working tree temporarily
+  // We save current status to detect if safe to proceed
+  const currentStatus = await getStatus();
+  const hasChanges = currentStatus.staged.length > 0 || currentStatus.unstaged.length > 0;
+  if (hasChanges) {
+    throw { message: 'Cannot preview merge: you have uncommitted changes. Please stash or commit them first.' };
+  }
+
+  let previewFiles = [];
+  try {
+    // Run merge with --no-commit to see what would change
+    await git(['merge', '--no-commit', '--no-ff', branch]).catch(e => e); // may exit non-0 on conflicts
+    
+    // Get status of what changed
+    const mergeStatus = await getStatus();
+    previewFiles = [
+      ...mergeStatus.staged.map(f => ({ file: f.file, status: f.status, conflicted: false })),
+      ...mergeStatus.unstaged.map(f => ({ file: f.file, status: f.status, conflicted: true }))
+    ];
+    
+    // Abort to restore state
+    await git(['merge', '--abort']).catch(() => {});
+    // Also reset to be safe
+    await git(['reset', '--hard', 'HEAD']).catch(() => {});
+  } catch (err) {
+    // Abort on any error
+    await git(['merge', '--abort']).catch(() => {});
+    await git(['reset', '--hard', 'HEAD']).catch(() => {});
+    throw err;
+  }
+
+  return { branch, files: previewFiles };
+}
+
+/**
+ * Abort current merge
+ */
+async function abortMerge() {
+  await git(['merge', '--abort']);
+  return getStatus();
+}
+
+/**
+ * Get current rebase status (in progress, todo list)
+ */
+async function getRebaseStatus() {
+  const fs = require('fs');
+  const gitDir = path.join(repoPath, '.git');
+  const rebaseMergeDir = path.join(gitDir, 'rebase-merge');
+
+  if (!fs.existsSync(rebaseMergeDir)) {
+    return { rebasing: false, todoList: [], step: 0, total: 0 };
+  }
+
+  let todoList = [];
+  let step = 0;
+  let total = 0;
+  let branch = null;
+
+  try {
+    const todoPath = path.join(rebaseMergeDir, 'git-rebase-todo');
+    const donePath = path.join(rebaseMergeDir, 'done');
+
+    const todoContent = fs.existsSync(todoPath) ? fs.readFileSync(todoPath, 'utf8') : '';
+    const doneContent = fs.existsSync(donePath) ? fs.readFileSync(donePath, 'utf8') : '';
+
+    const parseTodo = (text) => text.split('\n').filter(l => l.trim() && !l.startsWith('#')).map(l => {
+      const parts = l.split(' ');
+      return { action: parts[0], hash: parts[1], message: parts.slice(2).join(' ') };
+    });
+
+    const doneItems = parseTodo(doneContent);
+    const todoItems = parseTodo(todoContent);
+    todoList = [...doneItems.map(i => ({ ...i, done: true })), ...todoItems.map(i => ({ ...i, done: false }))];
+    step = doneItems.length;
+    total = todoList.length;
+
+    if (fs.existsSync(path.join(rebaseMergeDir, 'head-name'))) {
+      branch = fs.readFileSync(path.join(rebaseMergeDir, 'head-name'), 'utf8').trim().replace('refs/heads/', '');
+    }
+  } catch {}
+
+  return { rebasing: true, todoList, step, total, branch };
+}
+
+/**
+ * Start an interactive rebase — fetch commit list without modifying anything
+ * Returns the list of commits between HEAD and the target branch for the UI to edit.
+ */
+async function rebaseStart(branch) {
+  // Get commits that are ahead of the target branch
+  const format = '--format={"hash":"%H","shortHash":"%h","message":"%s"}';
+  const output = await git(['log', format, `${branch}..HEAD`]);
+  const lines = output.trim().split('\n').filter(Boolean);
+  
+  const commits = lines.map(line => {
+    try { return JSON.parse(line); } catch { return null; }
+  }).filter(Boolean);
+
+  // Reverse so oldest is first (matches git-rebase-todo order)
+  commits.reverse();
+
+  return { branch, commits };
+}
+
+/**
+ * Apply a user-defined rebase todo list (write to file and run non-interactive rebase)
+ */
+async function rebaseApply(branch, todoList) {
+  const fs = require('fs');
+  
+  // Build the todo file content
+  const todoContent = todoList
+    .map(item => `${item.action} ${item.hash} ${item.message}`)
+    .join('\n') + '\n';
+
+  // Use GIT_SEQUENCE_EDITOR=true (no-op) to skip editor, write file ourselves
+  const os = require('os');
+  const tmpTodo = path.join(os.tmpdir(), 'glorigit-rebase-todo');
+  fs.writeFileSync(tmpTodo, todoContent, 'utf8');
+
+  return new Promise((resolve, reject) => {
+    const { execFile } = require('child_process');
+    execFile('git', ['rebase', '-i', branch], {
+      cwd: repoPath,
+      env: {
+        ...process.env,
+        GIT_SEQUENCE_EDITOR: `cp "${tmpTodo}"`,
+        TERM: 'dumb'
+      },
+      maxBuffer: 1024 * 1024 * 5
+    }, async (error, stdout, stderr) => {
+      try { fs.unlinkSync(tmpTodo); } catch {}
+      if (error && error.code !== 0) {
+        // Conflicts during rebase — not fatal, user can continue
+        const status = await getStatus().catch(() => ({}));
+        resolve({ status, conflicts: true, message: stderr.trim() });
+      } else {
+        const status = await getStatus();
+        resolve({ status, conflicts: false });
+      }
+    });
+  });
+}
+
+/**
+ * Continue an in-progress rebase (after resolving conflicts)
+ */
+async function rebaseContinue() {
+  return new Promise((resolve, reject) => {
+    const { execFile } = require('child_process');
+    execFile('git', ['rebase', '--continue'], {
+      cwd: repoPath,
+      env: { ...process.env, GIT_EDITOR: 'true', TERM: 'dumb' },
+      maxBuffer: 1024 * 1024 * 5
+    }, async (error, stdout, stderr) => {
+      if (error && error.code !== 0) {
+        const status = await getStatus().catch(() => ({}));
+        resolve({ status, conflicts: true, message: stderr.trim() });
+      } else {
+        const status = await getStatus();
+        resolve({ status, conflicts: false });
+      }
+    });
+  });
+}
+
+/**
+ * Skip current commit during rebase
+ */
+async function rebaseSkip() {
+  await git(['rebase', '--skip']);
+  return getStatus();
+}
+
+/**
+ * Abort an in-progress rebase
+ */
+async function rebaseAbort() {
+  await git(['rebase', '--abort']);
+  return getStatus();
+}
+
 module.exports = {
   setRepoPath,
   getRepoPath,
@@ -780,9 +1102,16 @@ module.exports = {
   discardAllUntracked,
   getRepoName,
   isGitRepo,
-  // Duplicates in original export list, keeping them as is
-  getCommitFiles,
-  getCommitFileDiff,
-  getFileHistory,
-  getAuthorStats
+  // Phase 7: Conflict Warzone
+  getMergeStatus,
+  getConflicts,
+  resolveConflict,
+  getMergePreview,
+  abortMerge,
+  getRebaseStatus,
+  rebaseStart,
+  rebaseApply,
+  rebaseContinue,
+  rebaseSkip,
+  rebaseAbort
 };

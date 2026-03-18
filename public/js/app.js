@@ -16,6 +16,9 @@ import { closeCommitView } from './modules/historian.js';
 import { closeFileHistoryView } from './modules/timemachine.js';
 import { loadHeatmap } from './modules/heatmap.js';
 import { navigateLog, openSelectedCommit, unselectCommit, searchCommit, applyFilters, clearFilters, clearHighlight, redrawGraph } from './modules/log.js';
+import { openConflictResolver, closeConflictResolver } from './modules/conflicts.js';
+import { openMergePreview, closeMergePreview, proceedWithMerge } from './modules/merge-preview.js';
+import { openRebaseUI, closeRebaseModal, loadRebaseCommits, startRebase, rebaseContinue, rebaseSkip, rebaseAbort } from './modules/rebase.js';
 
 function bindEvents() {
   // Commit View Back Button
@@ -28,12 +31,77 @@ function bindEvents() {
     dom.commitView.style.display = 'none';
     dom.fileHistoryView.style.display = 'none';
     dom.storageView.style.display = 'flex';
+    dom.warzoneView.style.display = 'none';
     send('stashes');
   });
 
   dom.stashBackBtn.addEventListener('click', () => {
     dom.storageView.style.display = 'none';
     dom.workspaceView.style.display = 'flex';
+  });
+
+  // ─── Warzone ──────────────────────────────────────
+  dom.warzoneBtn.addEventListener('click', async () => {
+    dom.workspaceView.style.display = 'none';
+    dom.commitView.style.display = 'none';
+    dom.fileHistoryView.style.display = 'none';
+    dom.storageView.style.display = 'none';
+    dom.warzoneView.style.display = 'flex';
+    closeConflictResolver();
+    await renderWarzoneView();
+  });
+
+  dom.warzoneBackBtn.addEventListener('click', () => {
+    dom.warzoneView.style.display = 'none';
+    dom.workspaceView.style.display = 'flex';
+  });
+
+  // Warzone: Merge Preview
+  dom.warzonePreviewMergeBtn.addEventListener('click', () => {
+    const branch = prompt('Preview merging from branch:');
+    if (branch && branch.trim()) {
+      openMergePreview(branch.trim());
+    }
+  });
+  dom.mergePreviewModalClose.addEventListener('click', closeMergePreview);
+  dom.mergePreviewCancelBtn.addEventListener('click', closeMergePreview);
+  dom.mergePreviewProceedBtn.addEventListener('click', proceedWithMerge);
+  dom.mergePreviewModalOverlay.addEventListener('click', (e) => {
+    if (e.target === dom.mergePreviewModalOverlay) closeMergePreview();
+  });
+
+  // Warzone: Rebase Modal
+  dom.warzoneRebaseBtn.addEventListener('click', openRebaseUI);
+  dom.rebaseModalClose.addEventListener('click', closeRebaseModal);
+  dom.rebaseCancelBtn.addEventListener('click', closeRebaseModal);
+  dom.rebaseLoadBtn.addEventListener('click', loadRebaseCommits);
+  dom.rebaseTargetBranch.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') loadRebaseCommits();
+  });
+  dom.rebaseStartBtn.addEventListener('click', startRebase);
+  dom.rebaseModalOverlay.addEventListener('click', (e) => {
+    if (e.target === dom.rebaseModalOverlay) closeRebaseModal();
+  });
+
+  // Warzone: Abort Merge (from banner and sidebar button)
+  dom.conflictBannerAbortBtn.addEventListener('click', async () => {
+    showModal('Abort Merge', 'Are you sure you want to abort the current merge? All merge progress will be lost.', async () => {
+      try {
+        await send('abort-merge');
+        toast('Merge aborted', 'info');
+        send('merge-status');
+      } catch(err) {
+        toast(err.error || 'Abort failed', 'error');
+      }
+    });
+  });
+  dom.warzoneAbortMergeBtn.addEventListener('click', () => dom.conflictBannerAbortBtn.click());
+
+  // Rebase status bar controls
+  dom.rebaseContinueBtn.addEventListener('click', rebaseContinue);
+  dom.rebaseSkipBtn.addEventListener('click', rebaseSkip);
+  dom.rebaseAbortBtn.addEventListener('click', () => {
+    showModal('Abort Rebase', 'Are you sure you want to abort the rebase? The branch will be restored to its original state.', rebaseAbort);
   });
 
   // Branch dropdown
@@ -318,10 +386,17 @@ function bindEvents() {
       closeBranchDropdown();
       dom.helpModalOverlay.classList.remove('active');
       dom.heatmapModalOverlay.classList.remove('active');
+      closeMergePreview();
+      closeRebaseModal();
       unselectCommit(); // Clear log selection
 
       if (dom.storageView.style.display === 'flex') {
         dom.storageView.style.display = 'none';
+        dom.workspaceView.style.display = 'flex';
+      }
+
+      if (dom.warzoneView.style.display === 'flex') {
+        dom.warzoneView.style.display = 'none';
         dom.workspaceView.style.display = 'flex';
       }
 
@@ -370,6 +445,77 @@ function bindEvents() {
       openSelectedCommit();
     }
   });
+}
+
+/**
+ * Populate the warzoneView sidebar with current merge/conflict state
+ */
+async function renderWarzoneView() {
+  try {
+    const status = await send('merge-status');
+    const { conflicted = [], merging, rebasing, cherryPicking, mergeBranch, rebaseBranch } = status;
+
+    // Show/hide merge info strip
+    const mergeInfo = dom.warzoneMergeInfo;
+    if (merging || rebasing || cherryPicking) {
+      mergeInfo.style.display = 'flex';
+      if (rebasing) {
+        mergeInfo.className = 'warzone-merge-info';
+        mergeInfo.textContent = `⟳ Rebase in progress${rebaseBranch ? `: ${rebaseBranch}` : ''}`;
+      } else if (cherryPicking) {
+        mergeInfo.className = 'warzone-merge-info warzone-cherry-pick-info';
+        mergeInfo.textContent = '🍒 Cherry-pick in progress';
+      } else {
+        mergeInfo.className = 'warzone-merge-info';
+        mergeInfo.textContent = `⊕ Merge in progress${mergeBranch ? ` from ${mergeBranch}` : ''}`;
+      }
+    } else {
+      mergeInfo.style.display = 'none';
+    }
+
+    // Show abort button if merging
+    if (dom.warzoneAbortMergeBtn) {
+      dom.warzoneAbortMergeBtn.style.display = merging ? 'flex' : 'none';
+    }
+
+    // Render conflict file list
+    const conflictSection = dom.warzoneConflictSection;
+    const conflictList = dom.conflictFileList;
+    const emptyState = dom.warzoneEmptyState;
+
+    if (conflicted.length > 0) {
+      conflictSection.style.display = 'block';
+      emptyState.style.display = 'none';
+
+      conflictList.innerHTML = '';
+      conflicted.forEach((file, idx) => {
+        const li = document.createElement('li');
+        li.className = 'conflict-file-item';
+        li.dataset.file = file;
+        li.style.animationDelay = `${idx * 40}ms`;
+        li.innerHTML = `
+          <span class="conflict-file-icon">⚔</span>
+          <span class="conflict-file-name" title="${escapeHtml(file)}">${escapeHtml(file)}</span>
+        `;
+        li.addEventListener('click', () => openConflictResolver(file));
+        conflictList.appendChild(li);
+      });
+
+      // Update conflict banner in diff panel
+      if (dom.conflictBanner) {
+        dom.conflictBanner.style.display = 'flex';
+        if (dom.conflictBannerCount) {
+          dom.conflictBannerCount.textContent = `${conflicted.length} file${conflicted.length !== 1 ? 's' : ''}`;
+        }
+      }
+    } else {
+      conflictSection.style.display = 'none';
+      emptyState.style.display = 'flex';
+      if (dom.conflictBanner) dom.conflictBanner.style.display = 'none';
+    }
+  } catch (err) {
+    console.error('Failed to load warzone status', err);
+  }
 }
 
 function init() {

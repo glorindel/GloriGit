@@ -10,6 +10,7 @@ import { renderBranches } from '../modules/branches.js';
 import { renderLog } from '../modules/log.js';
 import { renderDiff } from '../modules/diff.js';
 import { renderStashes } from '../modules/storage.js';
+import { renderConflictBanner } from '../modules/conflicts.js';
 
 export function connect() {
   const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
@@ -24,6 +25,7 @@ export function connect() {
     send('status');
     send('branches');
     send('log', { count: 50 });
+    send('merge-status');
     loadRepoInfo();
   };
 
@@ -46,6 +48,8 @@ export function connect() {
     // Handle broadcast updates
     if (msg.action === 'status-update') {
       renderStatus(msg.data);
+      // Also refresh merge status on any repo change
+      send('merge-status').catch(() => {});
     }
 
     // Handle action responses
@@ -65,6 +69,9 @@ export function connect() {
       case 'diff':
       case 'diff-untracked':
         renderDiff(msg.data);
+        break;
+      case 'merge-status':
+        renderConflictBanner(msg.data);
         break;
     }
 

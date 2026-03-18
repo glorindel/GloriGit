@@ -111,5 +111,42 @@ export const dom = {
   heatmapBtn: $('heatmapBtn'),
   heatmapModalOverlay: $('heatmapModalOverlay'),
   heatmapModalClose: $('heatmapModalClose'),
-  heatmapContainer: $('heatmapContainer')
+  heatmapContainer: $('heatmapContainer'),
+
+  // Phase 7: Warzone
+  warzoneBtn: $('warzoneBtn'),
+  warzoneBadge: $('warzoneBadge'),
+  warzoneView: $('warzoneView'),
+  warzoneBackBtn: $('warzoneBackBtn'),
+  warzoneMergeInfo: $('warzoneMergeInfo'),
+  warzoneConflictSection: $('warzoneConflictSection'),
+  conflictFileList: $('conflictFileList'),
+  warzonePreviewMergeBtn: $('warzonePreviewMergeBtn'),
+  warzoneRebaseBtn: $('warzoneRebaseBtn'),
+  warzoneAbortMergeBtn: $('warzoneAbortMergeBtn'),
+  warzoneEmptyState: $('warzoneEmptyState'),
+  // Conflict banner
+  conflictBanner: $('conflictBanner'),
+  conflictBannerCount: $('conflictBannerCount'),
+  conflictBannerAbortBtn: $('conflictBannerAbortBtn'),
+  // Rebase status bar
+  rebaseStatusBar: $('rebaseStatusBar'),
+  rebaseContinueBtn: $('rebaseContinueBtn'),
+  rebaseSkipBtn: $('rebaseSkipBtn'),
+  rebaseAbortBtn: $('rebaseAbortBtn'),
+  // Merge preview modal
+  mergePreviewModalOverlay: $('mergePreviewModalOverlay'),
+  mergePreviewModalClose: $('mergePreviewModalClose'),
+  mergePreviewBranch: $('mergePreviewBranch'),
+  mergePreviewFileList: $('mergePreviewFileList'),
+  mergePreviewProceedBtn: $('mergePreviewProceedBtn'),
+  mergePreviewCancelBtn: $('mergePreviewCancelBtn'),
+  // Rebase modal
+  rebaseModalOverlay: $('rebaseModalOverlay'),
+  rebaseModalClose: $('rebaseModalClose'),
+  rebaseTargetBranch: $('rebaseTargetBranch'),
+  rebaseLoadBtn: $('rebaseLoadBtn'),
+  rebaseList: $('rebaseList'),
+  rebaseStartBtn: $('rebaseStartBtn'),
+  rebaseCancelBtn: $('rebaseCancelBtn')
 };
