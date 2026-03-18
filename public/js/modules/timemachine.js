@@ -3,7 +3,7 @@
  */
 import { state } from '../core/state.js';
 import { dom } from '../core/dom.js';
-import { escapeHtml, getTimeAgo } from '../core/utils.js';
+import { escapeHtml, getTimeAgo, formatDate } from '../core/utils.js';
 import { send } from '../core/ws.js';
 import { toast } from '../ui/toast.js';
 import { renderDiff, clearDiff } from './diff.js';
@@ -38,17 +38,18 @@ function renderFileHistory(history, file) {
     div.className = 'log-entry';
     div.style.cursor = 'pointer';
     
+    const dateStr = formatDate(entry.date);
     const timeAgo = getTimeAgo(entry.date);
     
     div.innerHTML = `
       <span class="log-hash">${escapeHtml(entry.shortHash)}</span>
       <span class="log-message">${escapeHtml(entry.message)}</span>
-      <span class="log-date">${timeAgo}</span>
+      <span class="log-date" title="${timeAgo}">${dateStr}</span>
     `;
     
     div.addEventListener('click', async () => {
-      document.querySelectorAll('#fhEntries .log-entry').forEach(el => el.classList.remove('selected', 'active'));
-      div.style.background = 'var(--bg-active)';
+      document.querySelectorAll('#fhEntries .log-entry').forEach(el => el.classList.remove('selected'));
+      div.classList.add('selected');
       
       state.selectedFile = file;
       state.selectedType = 'history';

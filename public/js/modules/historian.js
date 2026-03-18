@@ -3,7 +3,7 @@
  */
 import { state } from '../core/state.js';
 import { dom } from '../core/dom.js';
-import { escapeHtml, splitPath, getTimeAgo } from '../core/utils.js';
+import { escapeHtml, splitPath, getTimeAgo, formatDate } from '../core/utils.js';
 import { send } from '../core/ws.js';
 import { toast } from '../ui/toast.js';
 import { renderDiff, clearDiff } from './diff.js';
@@ -18,7 +18,7 @@ export async function openCommitView(commit) {
   
   // Populate Metadata
   dom.inspectCommitHash.textContent = commit.shortHash;
-  dom.inspectCommitDate.textContent = getTimeAgo(commit.date);
+  dom.inspectCommitDate.textContent = formatDate(commit.date);
   dom.inspectCommitAuthor.textContent = commit.author;
   dom.inspectCommitMessage.textContent = commit.message;
   

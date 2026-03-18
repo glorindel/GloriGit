@@ -16,7 +16,7 @@
  */
 import { state } from '../core/state.js';
 import { dom } from '../core/dom.js';
-import { escapeHtml, getTimeAgo } from '../core/utils.js';
+import { escapeHtml, getTimeAgo, formatDate } from '../core/utils.js';
 import { send } from '../core/ws.js';
 import { openCommitView } from './historian.js';
 import { toast } from '../ui/toast.js';
@@ -297,6 +297,7 @@ function renderLogEntries(log) {
       }
     }
 
+    const dateStr = formatDate(entry.date);
     const timeAgo = getTimeAgo(entry.date);
 
     div.innerHTML = `
@@ -305,7 +306,7 @@ function renderLogEntries(log) {
       <span class="log-message">${escapeHtml(entry.message)}</span>
       <span class="log-refs-wrap">${refsHtml}</span>
       <span class="log-author">${escapeHtml(entry.author)}</span>
-      <span class="log-date">${timeAgo}</span>
+      <span class="log-date" title="${timeAgo}">${dateStr}</span>
     `;
 
     div.addEventListener('click', () => {

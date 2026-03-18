@@ -192,10 +192,46 @@ function bindEvents() {
   // Log toggle
   dom.logToggle.addEventListener('click', () => {
     dom.logBar.classList.toggle('expanded');
-    // Redraw graph after CSS transition ends so entries have correct layout
     if (dom.logBar.classList.contains('expanded')) {
       setTimeout(() => redrawGraph(), 400);
     }
+  });
+
+  // Log Resize Logic
+  let isResizing = false;
+  let startY, startHeight;
+
+  dom.logResizer.addEventListener('mousedown', (e) => {
+    isResizing = true;
+    startY = e.clientY;
+    startHeight = dom.logBar.offsetHeight;
+    dom.logResizer.classList.add('active');
+    document.body.style.cursor = 'ns-resize';
+    document.body.style.userSelect = 'none';
+  });
+
+  document.addEventListener('mousemove', (e) => {
+    if (!isResizing) return;
+    const dy = startY - e.clientY;
+    const newHeight = Math.max(40, Math.min(window.innerHeight * 0.8, startHeight + dy));
+    dom.logBar.style.height = `${newHeight}px`;
+    
+    // If very small, unexpand
+    if (newHeight <= 50) {
+      dom.logBar.classList.remove('expanded');
+    } else {
+      dom.logBar.classList.add('expanded');
+    }
+    
+    redrawGraph();
+  });
+
+  document.addEventListener('mouseup', () => {
+    if (!isResizing) return;
+    isResizing = false;
+    dom.logResizer.classList.remove('active');
+    document.body.style.cursor = 'default';
+    document.body.style.userSelect = '';
   });
 
   // Modal

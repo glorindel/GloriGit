@@ -88,13 +88,35 @@
 
 /* --- Log Bar --- */
 .log-bar {
-  max-height: 40px;
+  height: 250px; /* Default height when expanded */
+  min-height: 40px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
-  transition: max-height var(--speed-slow) var(--ease);
+  position: relative;
+  transition: height 0.1s ease-out; /* Smooth but fast for dragging */
 }
 
-.log-bar.expanded {
-  max-height: 400px;
+.log-bar:not(.expanded) {
+  height: 40px !important;
+}
+
+.log-resizer {
+  height: 4px;
+  width: 100%;
+  cursor: ns-resize;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  background: transparent;
+  transition: background var(--speed-fast);
+}
+
+.log-resizer:hover, .log-resizer.active {
+  background: var(--accent);
+  box-shadow: 0 0 10px var(--accent-glow);
 }
 
 .log-toolbar {
@@ -194,8 +216,8 @@
 
 /* --- Log Entries Area --- */
 .log-entries {
+  flex: 1;
   overflow-y: auto;
-  max-height: 340px;
   padding: 0 8px 8px;
   position: relative;
 }

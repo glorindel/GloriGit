@@ -49,6 +49,7 @@ export const dom = {
   // Log
   logBar: $('logBar'),
   logToggle: $('logToggle'),
+  logResizer: $('logResizer'),
   logEntries: $('logEntries'),
   logEntriesContent: $('logEntriesContent'),
 
