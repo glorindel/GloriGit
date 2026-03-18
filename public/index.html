@@ -21,53 +21,36 @@
   <link rel="stylesheet" href="/css/responsive.css">
 </head>
 <body>
-  <!-- Header -->
   <header id="app-header">
     <div class="header-actions">
-      <!-- Meta Group -->
-      <div class="action-group">
-        <button class="header-action" id="refreshBtn" title="Refresh">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-          <path d="M13.65 2.35a8 8 0 1 0 1.77 5.15h-2.02a6 6 0 1 1-1.27-3.63L10 6h6V0l-2.35 2.35Z"/>
-        </svg>
-      </button>
-      <button class="header-action" id="helpBtn" title="Keyboard Shortcuts (?)">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"></circle>
-          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-          <line x1="12" y1="17" x2="12.01" y2="17"></line>
-        </svg>
-      </div>
-
-      <div class="header-divider"></div>
-
-      <!-- Repo Ops Group -->
-      <div class="action-group">
-        <button class="header-action" id="heatmapBtn" title="Author Impact">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-          <path d="M2 12h2v2H2v-2zm3-4h2v6H5V8zm3-3h2v9H8V5zm3-3h2v13h-2V1z"/>
-        </svg>
-        <span>Heatmap</span>
-      </button>
-      <button class="header-action" id="storageBtn" title="Stashes">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-          <path d="M1 3.5c0-.626.292-1.165.7-1.59.406-.422.956-.767 1.579-1.016C4.525.396 5.966 0 8 0s3.475.397 4.72.895c.623.25 1.173.593 1.579 1.015.408.425.7 1.05.7 1.59v9c0 .626-.292 1.165-.7 1.59-.406.422-.956.767-1.579 1.016C11.475 15.604 10.034 16 8 16s-3.475-.397-4.72-.895c-.623-.25-1.173-.593-1.579-1.015C1.292 13.665 1 13.04 1 12.5v-9zm7 1.5c1.82 0 3.023-.332 3.864-.67.41-.165.688-.337.838-.475-.15-.138-.428-.31-.838-.475C11.023 3.033 9.82 2.7 8 2.7c-1.82 0-3.023.332-3.864.67-.41.165-.688.337-.838.475.15.138.428.31.838.475C4.977 4.667 6.18 5 8 5zm0 1.5c-1.396 0-2.618-.21-3.56-.492a4.9 4.9 0 01-.65-.246V7c0 .245.061.5.213.725.148.22.368.441.674.636C6.012 9.172 7.158 9.5 8 9.5c.842 0 1.988-.328 3.323-1.139.306-.195.526-.416.674-.636.152-.224.213-.48.213-.725V5.762c-.198.092-.416.18-.65.246C10.618 6.29 9.396 6.5 8 6.5zm0 4.5c-1.396 0-2.618-.21-3.56-.492a4.9 4.9 0 01-.65-.246V10c0 .245.061.5.213.725.148.22.368.441.674.636C6.012 12.172 7.158 12.5 8 12.5c.842 0 1.988-.328 3.323-1.139.306-.195.526-.416.674-.636.152-.224.213-.48.213-.725V8.762c-.198.092-.416.18-.65.246C10.618 9.29 9.396 9.5 8 9.5z"/>
-        </svg>
-        <span>Stashes</span>
-      </button>
-      <button class="header-action" id="pullBtn" title="Pull">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-          <path d="M7.5 1v9.793L4.354 7.646l-.708.708L8 12.707l4.354-4.353-.708-.708L8.5 10.793V1h-1Z"/>
-          <path d="M1 13v2h14v-2H1Z"/>
-        </svg>
-        <span>Pull</span>
-      </button>
-      <button class="header-action push" id="pushBtn" title="Push">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-          <path d="M8.5 14V4.207l3.146 3.147.708-.708L8 2.293 3.646 6.646l.708.708L7.5 4.207V14h1Z"/>
-          <path d="M1 1v2h14V1H1Z"/>
-        </svg>
-        <span>Push</span>
+      <!-- Git Ops Group -->
+      <div class="action-group main-actions">
+        <button class="header-action pull" id="pullBtn" title="Pull (Ctrl+Shift+L)">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M7.5 1v9.793L4.354 7.646l-.708.708L8 12.707l4.354-4.353-.708-.708L8.5 10.793V1h-1Z"/>
+            <path d="M1 13v2h14v-2H1Z"/>
+          </svg>
+          <span>Pull</span>
+        </button>
+        <button class="header-action push" id="pushBtn" title="Push (Ctrl+Shift+P)">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M8.5 14V4.207l3.146 3.147.708-.708L8 2.293 3.646 6.646l.708.708L7.5 4.207V14h1Z"/>
+            <path d="M1 1v2h14V1H1Z"/>
+          </svg>
+          <span>Push</span>
+        </button>
+        <button class="header-action storage" id="storageBtn" title="Stashes">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M1 3.5c0-.626.292-1.165.7-1.59.406-.422.956-.767 1.579-1.016C4.525.396 5.966 0 8 0s3.475.397 4.72.895c.623.25 1.173.593 1.579 1.015.408.425.7 1.05.7 1.59v9c0 .626-.292 1.165-.7 1.59-.406.422-.956.767-1.579 1.016C11.475 15.604 10.034 16 8 16s-3.475-.397-4.72-.895c-.623-.25-1.173-.593-1.579-1.015C1.292 13.665 1 13.04 1 12.5v-9zm7 1.5c1.82 0 3.023-.332 3.864-.67.41-.165.688-.337.838-.475-.15-.138-.428-.31-.838-.475C11.023 3.033 9.82 2.7 8 2.7c-1.82 0-3.023.332-3.864.67-.41.165-.688.337-.838.475.15.138.428.31.838.475C4.977 4.667 6.18 5 8 5zm0 1.5c-1.396 0-2.618-.21-3.56-.492a4.9 4.9 0 01-.65-.246V7c0 .245.061.5.213.725.148.22.368.441.674.636C6.012 9.172 7.158 9.5 8 9.5c.842 0 1.988-.328 3.323-1.139.306-.195.526-.416.674-.636.152-.224.213-.48.213-.725V5.762c-.198.092-.416.18-.65.246C10.618 6.29 9.396 6.5 8 6.5zm0 4.5c-1.396 0-2.618-.21-3.56-.492a4.9 4.9 0 01-.65-.246V10c0 .245.061.5.213.725.148.22.368.441.674.636C6.012 12.172 7.158 12.5 8 12.5c.842 0 1.988-.328 3.323-1.139.306-.195.526-.416.674-.636.152-.224.213-.48.213-.725V8.762c-.198.092-.416.18-.65.246C10.618 9.29 9.396 9.5 8 9.5z"/>
+          </svg>
+          <span>Stashes</span>
+        </button>
+        <button class="header-action heatmap" id="heatmapBtn" title="Author Impact">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M2 12h2v2H2v-2zm3-4h2v6H5V8zm3-3h2v9H8V5zm3-3h2v13h-2V1z"/>
+          </svg>
+          <span>Heatmap</span>
+        </button>
       </div>
     </div>
 
@@ -105,11 +88,26 @@
         <span class="repo-name" id="repoName">Loading...</span>
         <span class="repo-path" id="repoPath"></span>
       </div>
-      <div class="logo" id="logo">
-        <span class="logo-text">GloriGit</span>
-        <span class="logo-icon">⚡</span>
+      <div class="header-divider"></div>
+      <div class="action-group util-actions">
+        <button class="header-action icon-only" id="refreshBtn" title="Refresh (Ctrl+R)">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M13.65 2.35a8 8 0 1 0 1.77 5.15h-2.02a6 6 0 1 1-1.27-3.63L10 6h6V0l-2.35 2.35Z"/>
+          </svg>
+        </button>
+        <button class="header-action icon-only" id="helpBtn" title="Keyboard Shortcuts (?)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+        </button>
       </div>
-      
+      <div class="header-divider"></div>
+      <div class="logo" id="logo">
+        <span class="logo-icon">⚡</span>
+        <span class="logo-text">GloriGit</span>
+      </div>
     </div>
   </header>
 
